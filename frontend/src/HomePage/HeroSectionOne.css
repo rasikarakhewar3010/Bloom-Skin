@@ -1,0 +1,18 @@
+.bloomskain-text {
+    font-size: 7rem;
+    /* Very large text size */
+    font-weight: bold;
+    margin: 0;
+    position: relative;
+}
+
+.cursor {
+    color: #FB6F92;
+    font-size: 7rem;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.cursor.visible {
+    opacity: 1;
+}
