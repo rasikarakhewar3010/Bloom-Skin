@@ -31,7 +31,7 @@ export function HeroSectionOne() {
   }, []);
 
   return (
-    <BackgroundLines className="flex items-center justify-center w-full flex-col px-4 h-[93vh] relative top-[-80px]">
+    <BackgroundLines className="flex items-center justify-center w-full flex-col px-4 h-[93vh] relative top-[-20px]">
       <div className="bloomskain-container">
 
         <h1 className="bloomskain-text bg-clip-text text-transparent text-center bg-gradient-to-b from-neutral-900 to-neutral-700 dark:from-neutral-600 dark:to-white  md:text-4xl lg:text-7xl font-sans py-2 md:py-10 relative z-20 font-bold tracking-tight">
@@ -43,7 +43,7 @@ export function HeroSectionOne() {
         Unlock the secret to glowing skin with Bloom Skin.
         Experience a transformative journey that nurtures, heals, and rejuvenates your skin with every application.
       </p>
-      <div className='z-60 m-6'>
+      <div className='z-10 m-9 top-10'>
         <button className="p-[3px] relative">
           <div className="absolute inset-0 bg-gradient-to-r from-[#FFC2D1] to-[#FB6F92] rounded-lg" />
           <div className="px-8 py-2  bg-neutral-900 rounded-[6px]  relative group transition duration-200 text-white hover:bg-transparent hover:text-black font-medium">

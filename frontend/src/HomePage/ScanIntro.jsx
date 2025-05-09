@@ -7,8 +7,8 @@ const ScanIntro = () => {
             <div className="flex flex-wrap">
                 <div className="w-full md:w-1/2 p-4">
                     <BeforeAfterSlider
-                        beforeImage="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSL_eLXjR6L5kuW7Bv-ny-o48UgwrBEW9-gAw&s"
-                        afterImage="https://marketplace.canva.com/EAFiN8tytkM/1/0/900w/canva-brown-aesthetic-flower-phone-wallpaper-JdUFkY6mPh4.jpg"
+                        beforeImage="/images/before3.png"
+                        afterImage="/images/after3.png"
                         width="100%"
                         height="500px"
                     />

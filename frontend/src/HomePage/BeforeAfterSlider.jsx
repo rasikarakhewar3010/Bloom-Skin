@@ -1,85 +1,73 @@
 import React, { useState, useRef, useEffect } from 'react';
 
 const BeforeAfterSlider = ({ beforeImage, afterImage, width = '100%', height = 'auto' }) => {
-  const [sliderPosition, setSliderPosition] = useState(50);
+  const [sliderPosition, setSliderPosition] = useState(50); // Default to half-half
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef(null);
 
-  const handleMouseDown = () => {
-    setIsDragging(true);
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
+  const handleMouseDown = () => setIsDragging(true);
+  const handleMouseUp = () => setIsDragging(false);
 
   const handleMouseMove = (e) => {
     if (!isDragging || !containerRef.current) return;
-    
-    const containerRect = containerRef.current.getBoundingClientRect();
-    const x = e.clientX - containerRect.left;
-    const percentage = Math.min(Math.max((x / containerRect.width) * 100, 0), 100);
-    
+
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const percentage = Math.min(Math.max((x / rect.width) * 100, 0), 100);
     setSliderPosition(percentage);
   };
 
   useEffect(() => {
-    const handleGlobalMouseUp = () => {
-      if (isDragging) setIsDragging(false);
-    };
-
+    const handleGlobalMouseUp = () => setIsDragging(false);
     window.addEventListener('mouseup', handleGlobalMouseUp);
     return () => window.removeEventListener('mouseup', handleGlobalMouseUp);
-  }, [isDragging]);
+  }, []);
 
   return (
-    <div 
-      className="before-after-container"
+    <div
       ref={containerRef}
       onMouseMove={handleMouseMove}
-      onMouseLeave={() => setIsDragging(false)}
-      style={{ width, height, position: 'relative', overflow: 'hidden',borderRadius: '16px' }}
+      onMouseLeave={handleMouseUp}
+      style={{
+        width,
+        height,
+        position: 'relative',
+        overflow: 'hidden',
+        borderRadius: '16px',
+        userSelect: 'none',
+      }}
     >
-      {afterImage && (
-        <img
-          src={afterImage}
-          alt="After"
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            position: 'absolute',
-            top: 0,
-            left: 0
-          }}
-        />
-      )}
-      
-      {beforeImage && (
-        <div
-          style={{
-            width: `${sliderPosition}%`,
-            height: '100%',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            overflow: 'hidden'
-          }}
-        >
-          <img
-            src={beforeImage}
-            alt="Before"
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover'
-            }}
-          />
-        </div>
-      )}
-      
+      {/* After Image */}
+      <img
+        src={afterImage}
+        alt="After"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          height: '100%',
+          width: '100%',
+          objectFit: 'cover',
+        }}
+      />
+
+      {/* Before Image (visible only to sliderPosition%) */}
+      <img
+        src={beforeImage}
+        alt="Before"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          height: '100%',
+          width: '100%',
+          objectFit: 'cover',
+          clipPath: `inset(0 ${100 - sliderPosition}% 0 0)`, // clip right side
+        }}
+      />
+
+      {/* Slider handle */}
       <div
-        className="slider-line"
         style={{
           position: 'absolute',
           left: `${sliderPosition}%`,
@@ -89,12 +77,11 @@ const BeforeAfterSlider = ({ beforeImage, afterImage, width = '100%', height = '
           backgroundColor: 'white',
           cursor: 'ew-resize',
           transform: 'translateX(-2px)',
-          zIndex: 10
+          zIndex: 10,
         }}
         onMouseDown={handleMouseDown}
       >
         <div
-          className="slider-handle"
           style={{
             position: 'absolute',
             top: '50%',
@@ -107,7 +94,7 @@ const BeforeAfterSlider = ({ beforeImage, afterImage, width = '100%', height = '
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.2)'
+            boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
           }}
         >
           <svg
@@ -122,16 +109,6 @@ const BeforeAfterSlider = ({ beforeImage, afterImage, width = '100%', height = '
           </svg>
         </div>
       </div>
-      
-      <style jsx>{`
-        .before-after-container {
-          user-select: none;
-        }
-        
-        .before-after-container:active {
-          cursor: ew-resize;
-        }
-      `}</style>
     </div>
   );
 };

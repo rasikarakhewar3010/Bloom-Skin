@@ -41,7 +41,7 @@ const WhyChooseBloomSkin = () => {
   ];
 
   return (
-    <section className="py-16 bg-gradient-to-b from-pink-50 to-white">
+    <section className="py-16 bg-gradient-to-b from-pink-50 to-white mt-3">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">Why Choose Bloom Skin</h2>
