@@ -80,11 +80,6 @@ const BloomSkinFooter = () => {
               </li>
               <li>
                 <a href="#" className="text-gray-600 hover:text-pink-500 transition-colors">
-                  Our Products
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-600 hover:text-pink-500 transition-colors">
                   Skin Quiz
                 </a>
               </li>
@@ -93,11 +88,7 @@ const BloomSkinFooter = () => {
                   FAQ
                 </a>
               </li>
-              <li>
-                <a href="#" className="text-gray-600 hover:text-pink-500 transition-colors">
-                  Blog (Coming Soon)
-                </a>
-              </li>
+              
             </ul>
           </div>
 
@@ -123,11 +114,6 @@ const BloomSkinFooter = () => {
               <li>
                 <a href="#" className="text-gray-600 hover:text-pink-500 transition-colors">
                   Return Policy
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-600 hover:text-pink-500 transition-colors">
-                  Cookie Policy
                 </a>
               </li>
             </ul>
