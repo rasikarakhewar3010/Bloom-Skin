@@ -5,7 +5,7 @@ import ScanIntro from './ScanIntro';
 import { StickyScrollRevealDemo } from './StickyScrollRevealDemo';
 import WhyChooseBloomSkin from './WhyChooseBloomSkin';
 import BloomSkinFooter from './BloomSkinFooter';
-// import Features from './Features';
+import ChatBot from './chatbot';
 
 const HomePage = () => {
     return (
@@ -14,8 +14,10 @@ const HomePage = () => {
             <HeroSectionOne className="" />
             <ScanIntro />
             <StickyScrollRevealDemo />
-            <WhyChooseBloomSkin/>
-            <BloomSkinFooter/>
+            <WhyChooseBloomSkin />
+            <BloomSkinFooter />
+            <ChatBot />
+
         </>
     );
 };
