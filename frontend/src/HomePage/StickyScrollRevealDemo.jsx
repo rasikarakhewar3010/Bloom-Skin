@@ -66,7 +66,7 @@ const content = [
 export function StickyScrollRevealDemo() {
   return (
     <div className="w-full py-4 md:py-8 mt-10 md:mt-20 pt-10 md:pt-20 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-9xl mx-auto">
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 md:mb-12 text-neutral-800 dark:text-white">
           Skin Concerns We Address
         </h2>

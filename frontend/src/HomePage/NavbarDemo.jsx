@@ -11,6 +11,8 @@ import {
   MobileNavMenu,
 } from "@/components/ui/resizable-navbar";
 import { useState } from "react";
+import { Link } from 'react-router-dom';
+
 
 export function NavbarDemo() {
   const navItems = [
@@ -20,7 +22,7 @@ export function NavbarDemo() {
     },
     {
       name: "Guide",
-      link: "#pricing",
+      link: "/guide",
     },
     {
       name: "Contact",

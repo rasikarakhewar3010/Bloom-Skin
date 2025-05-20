@@ -13,9 +13,9 @@ import React, { useRef, useState } from "react";
 
 export const Navbar = ({
   children,
-  className
+  className  
 }) => {
-  const ref = useRef(null);
+  const ref = useRef(null); 
   const { scrollY } = useScroll({
     target: ref,
     offset: ["start start", "end start"],
@@ -192,7 +192,7 @@ export const MobileNavToggle = ({
 export const NavbarLogo = () => {
   return (
     (<a
-      href="#"
+      href="/"
       className="relative z-60 mr-4 flex items-center space-x-2 px-2 py-1 text-sm font-normal text-black">
       <img
         src="https://assets.aceternity.com/logo-dark.png"

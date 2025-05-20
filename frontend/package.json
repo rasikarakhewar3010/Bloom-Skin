@@ -11,6 +11,7 @@
     "clean-start": "rm -rf node_modules/.vite && npm install && npm run dev"
   },
   "dependencies": {
+    "@splinetool/react-spline": "^4.0.0",
     "@tabler/icons-react": "^3.31.0",
     "@tailwindcss/vite": "^4.1.5",
     "@tsparticles/engine": "^3.8.1",
@@ -18,12 +19,13 @@
     "@tsparticles/slim": "^3.8.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "framer-motion": "^12.10.5",
+    "framer-motion": "^12.12.1",
     "lucide-react": "^0.508.0",
-    "motion": "^12.10.4",
+    "motion": "^12.12.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-icons": "^5.5.0",
+    "react-router-dom": "^7.6.0",
     "tailwind-merge": "^3.2.0",
     "tailwindcss": "^4.1.5"
   },
