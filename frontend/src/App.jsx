@@ -9,6 +9,9 @@ import GuidePage from './GuidePage/GuidePage';
 import ContactUs from './ContactUs/ContactUs';
 import NotFoundPage from './components/NotFoundPage';
 import ContactUsPage from './ContactUs/ContactUsPage';
+import LoginSignup from './LoginPage/LoginSignup';
+import { AuthProvider } from "./context/AuthContext"; // ✅ NEW
+
 
 function AppWrapper() {
   const location = useLocation();
@@ -34,13 +37,16 @@ function AppWrapper() {
   }
 
   return (
-    <Routes>
-      <Route path="/" element={<HomePage />} />
-      {/* <Route path="/login" element={<LoginPage />} /> */}
-      <Route path="/guide" element={<GuidePage />} />
-      <Route path="/contact" element={<ContactUsPage />} />
-      <Route path="*" element={<NotFoundPage />} /> {/* ✅ 404 fallback route */}
-    </Routes>
+    <AuthProvider>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        {/* <Route path="/login" element={<LoginPage />} /> */}
+        <Route path="/guide" element={<GuidePage />} />
+        <Route path="/contact" element={<ContactUsPage />} />
+        <Route path="/login" element={<LoginSignup />} />
+        <Route path="*" element={<NotFoundPage />} /> {/* ✅ 404 fallback route */}
+      </Routes>
+    </AuthProvider>
   );
 }
 
