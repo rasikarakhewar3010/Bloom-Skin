@@ -6,6 +6,9 @@ import BloomLoader from './HomePage/BloomLoader';
 import HomePage from './HomePage/HomePage';
 // import LoginPage from './pages/LoginPage';
 import GuidePage from './GuidePage/GuidePage';
+import ContactUs from './ContactUs/ContactUs';
+import NotFoundPage from './components/NotFoundPage';
+import ContactUsPage from './ContactUs/ContactUsPage';
 
 function AppWrapper() {
   const location = useLocation();
@@ -15,15 +18,13 @@ function AppWrapper() {
     const loaderAlreadyShown = sessionStorage.getItem('loaderShown');
 
     if (location.pathname === '/' && !loaderAlreadyShown) {
-      // Show loader only once per session
       const timer = setTimeout(() => {
         setLoading(false);
         sessionStorage.setItem('loaderShown', 'true');
-      }, 2500); // Adjust timing as needed
+      }, 2500);
 
       return () => clearTimeout(timer);
     } else {
-      // Skip loader for all other pages or if already shown
       setLoading(false);
     }
   }, [location.pathname]);
@@ -37,6 +38,8 @@ function AppWrapper() {
       <Route path="/" element={<HomePage />} />
       {/* <Route path="/login" element={<LoginPage />} /> */}
       <Route path="/guide" element={<GuidePage />} />
+      <Route path="/contact" element={<ContactUsPage />} />
+      <Route path="*" element={<NotFoundPage />} /> {/* ✅ 404 fallback route */}
     </Routes>
   );
 }

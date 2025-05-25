@@ -11,6 +11,7 @@
     "clean-start": "rm -rf node_modules/.vite && npm install && npm run dev"
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "@splinetool/react-spline": "^4.0.0",
     "@tabler/icons-react": "^3.31.0",
     "@tailwindcss/vite": "^4.1.5",
