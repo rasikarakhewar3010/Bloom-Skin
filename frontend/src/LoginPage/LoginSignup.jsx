@@ -1,15 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; // ✅ IMPORT
+import { useAuth } from "../context/AuthContext"; // ✅ Auth context
 
 const LoginSignup = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [flash, setFlash] = useState({ message: "", type: "" });
   const navigate = useNavigate();
-  const { setIsLoggedIn } = useAuth(); // ✅ FROM CONTEXT
+  const { setIsLoggedIn } = useAuth(); // ✅ Context function
 
   const toggle = () => {
     setIsLogin(!isLogin);
@@ -42,9 +42,8 @@ const LoginSignup = () => {
       });
       showFlash(`${isLogin ? "Login" : "Signup"} Successful`, "success");
 
-      // ✅ Save login status
       localStorage.setItem("isLoggedIn", "true");
-      setIsLoggedIn(true); // ✅ update global state
+      setIsLoggedIn(true);
 
       setTimeout(() => {
         navigate("/");
@@ -55,9 +54,29 @@ const LoginSignup = () => {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:5000/api/auth/google";
+    window.open("http://localhost:5000/api/auth/google", "_self");
   };
 
+  // ✅ Check session after Google login
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/auth/me", {
+          withCredentials: true,
+        });
+        if (res.data && res.data._id) {
+          localStorage.setItem("isLoggedIn", "true");
+          setIsLoggedIn(true);
+          navigate("/");
+        }
+      } catch (err) {
+        console.log("User not logged in via session");
+      }
+    };
+    checkAuth();
+  }, [setIsLoggedIn, navigate]);
+
+  
   return (
     <div className="min-h-screen flex items-center justify-center bg-pink-50 p-4 relative">
       <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md transition-all duration-300">

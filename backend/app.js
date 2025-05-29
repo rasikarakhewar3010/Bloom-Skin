@@ -11,30 +11,50 @@ require("./config/passport");
 
 const app = express();
 
-// Middleware
-app.use(cors({
-  origin: process.env.FRONTEND_URL,
-  credentials: true,
-}));
+// ------------------------------
+// ✅ Middleware
+// ------------------------------
 app.use(express.json());
 app.use(cookieParser());
+
+app.use(cors({
+  origin: process.env.FRONTEND_URL, // e.g. http://localhost:3000
+  credentials: true,
+}));
+
 app.use(session({
-  secret: process.env.SESSION_SECRET,
+  secret: process.env.SESSION_SECRET || "keyboard cat",
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false }, // Set true if using HTTPS
+  cookie: {
+    secure: process.env.NODE_ENV === "production",
+    httpOnly: true,
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  },
 }));
+
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Routes
+// ✅ Debug session/user in development
+app.use((req, res, next) => {
+  console.log("Session:", req.session);
+  console.log("User:", req.user);
+  next();
+});
+
+// ------------------------------
+// ✅ Routes
+// ------------------------------
 app.use("/api/auth", require("./routes/auth"));
 
-// Start server
+// ------------------------------
+// ✅ Connect to MongoDB & Start Server
+// ------------------------------
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
-    app.listen(process.env.PORT, () =>
-      console.log(`Server running at http://localhost:${process.env.PORT}`)
-    );
+    app.listen(process.env.PORT || 5000, () => {
+      console.log(`Server running at http://localhost:${process.env.PORT}`);
+    });
   })
-  .catch((err) => console.error("DB connection error:", err));
+  .catch((err) => console.error(" DB connection error:", err));

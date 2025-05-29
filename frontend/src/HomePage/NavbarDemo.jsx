@@ -17,19 +17,48 @@ import axios from "axios";
 export function NavbarDemo() {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    localStorage.getItem("isLoggedIn") === "true"
+  );
+  const [flash, setFlash] = useState("");
 
   useEffect(() => {
-    const checkLoginStatus = async () => {
-      try {
-        const loggedIn = localStorage.getItem("isLoggedIn") === "true";
-        setIsLoggedIn(loggedIn);
-      } catch (error) {
-        setIsLoggedIn(false);
-      }
+    const checkLoginStatus = () => {
+      const loggedIn = localStorage.getItem("isLoggedIn") === "true";
+      setIsLoggedIn(loggedIn);
     };
+
     checkLoginStatus();
+
+    // Listen for login state changes across tabs or Google popup
+    const handleStorageChange = () => {
+      checkLoginStatus();
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, []);
+
+  const showFlash = (msg) => {
+    setFlash(msg);
+    setTimeout(() => setFlash(""), 3000);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await axios.get("http://localhost:5000/api/auth/logout", {
+        withCredentials: true,
+      });
+      localStorage.removeItem("isLoggedIn");
+      setIsLoggedIn(false);
+      showFlash("You have logged out successfully.");
+    } catch (error) {
+      showFlash("Logout failed. Try again.");
+    }
+  };
 
   const navItems = [
     { name: "AI Camera", link: "#features" },
@@ -37,35 +66,24 @@ export function NavbarDemo() {
     { name: "Contact", link: "/contact" },
   ];
 
-const handleLogout = async () => {
-  try {
-    await axios.get("http://localhost:5000/api/auth/logout", {
-      withCredentials: true,
-    });
-    localStorage.removeItem("isLoggedIn");
-    setIsLoggedIn(false);
-    alert("You are logged out successfully.");
-    // navigate("/login"); ← REMOVE THIS LINE
-  } catch (error) {
-    alert("Logout failed. Try again.");
-  }
-};
-
-
   return (
     <div className="relative w-full pt-8 z-60">
+      {flash && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-yellow-100 border border-yellow-300 text-yellow-800 px-4 py-2 rounded-lg shadow-md z-50 transition-all duration-300">
+          {flash}
+        </div>
+      )}
+
       <Navbar>
-        {/* Desktop Navigation */}
         <NavBody>
           <NavbarLogo />
           <NavItems items={navItems} />
           <div className="flex items-center gap-4">
-            {!isLoggedIn && (
+            {!isLoggedIn ? (
               <Link to="/login">
                 <NavbarButton variant="secondary">Login</NavbarButton>
               </Link>
-            )}
-            {isLoggedIn && (
+            ) : (
               <>
                 <Link to="/profile">
                   <NavbarButton variant="primary">Profile</NavbarButton>
@@ -78,7 +96,6 @@ const handleLogout = async () => {
           </div>
         </NavBody>
 
-        {/* Mobile Navigation */}
         <MobileNav>
           <MobileNavHeader>
             <NavbarLogo />
@@ -103,7 +120,7 @@ const handleLogout = async () => {
               </a>
             ))}
             <div className="flex w-full flex-col gap-4 mt-4">
-              {!isLoggedIn && (
+              {!isLoggedIn ? (
                 <Link to="/login">
                   <NavbarButton
                     onClick={() => setIsMobileMenuOpen(false)}
@@ -113,8 +130,7 @@ const handleLogout = async () => {
                     Login
                   </NavbarButton>
                 </Link>
-              )}
-              {isLoggedIn && (
+              ) : (
                 <>
                   <Link to="/profile">
                     <NavbarButton
