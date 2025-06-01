@@ -13,6 +13,7 @@ import LoginSignup from './LoginPage/LoginSignup';
 import AuthCallback from "./LoginPage/AuthCallback"; // 👈 import this
 
 import { AuthProvider } from "./context/AuthContext"; // ✅ NEW
+import AIChatPage from './AIChatPage/AIChatPage';
 
 
 function AppWrapper() {
@@ -46,9 +47,10 @@ function AppWrapper() {
         <Route path="/guide" element={<GuidePage />} />
         <Route path="/contact" element={<ContactUsPage />} />
         <Route path="/login" element={<LoginSignup />} />
-        <Route path="/auth/callback" element={<AuthCallback />} /> {/* 👈 add this */}
+        <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/skin" element={<AIChatPage />} /> 
 
-        <Route path="*" element={<NotFoundPage />} /> {/* ✅ 404 fallback route */}
+        <Route path="*" element={<NotFoundPage />} /> 
       </Routes>
     </AuthProvider>
   );

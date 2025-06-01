@@ -38,7 +38,7 @@ router.get(
     session: true,
   }),
   (req, res) => {
-    // ✅ Redirect to frontend on success
+    //  Redirect to frontend on success
     res.redirect(process.env.FRONTEND_URL || "http://localhost:3000");
   }
 );
