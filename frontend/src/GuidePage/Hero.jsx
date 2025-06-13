@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 
 const Hero = () => {
+  const navigate = useNavigate();
   const [hoveredText, setHoveredText] = useState(null);
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
 
   const handleTextHover = (text) => setHoveredText(text);
   const handleTextLeave = () => setHoveredText(null);
-
+  const handleGetStartedClick = () => {
+    // You could do other things here first, like an API call
+    navigate('/aichat');
+  };
   useEffect(() => {
     const handleMouseMove = (e) => {
       setCursorPos({ x: e.clientX, y: e.clientY });
@@ -70,6 +76,7 @@ const Hero = () => {
         </h1>
 
         <button
+          onClick={handleGetStartedClick}
           className={`relative px-8 py-4 md:px-12 md:py-5 rounded-full font-semibold tracking-widest text-sm sm:text-base uppercase overflow-hidden transition-all duration-700 ease-in-out shadow-lg group
             ${hoveredText === 'button' ? 'text-[#FB6F92] border-[#FB6F92]' : 'text-black border-black'}
             border-2 hover:scale-105 active:scale-95`}

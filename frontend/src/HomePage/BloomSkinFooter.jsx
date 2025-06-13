@@ -120,26 +120,6 @@ const BloomSkinFooter = () => {
           </div>
         </div>
 
-        {/* Newsletter Subscription */}
-        <div className="bg-white rounded-xl p-8 mb-12 shadow-sm border border-pink-200">
-          <div className="max-w-2xl mx-auto text-center">
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">Stay Blooming Beautiful</h3>
-            <p className="text-gray-600 mb-6">
-              Subscribe to our newsletter for skincare tips, exclusive offers, and product updates.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-              <input
-                type="email"
-                placeholder="Your email address"
-                className="flex-grow px-4 py-3 rounded-lg border border-pink-300 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-              />
-              <button className="px-6 py-3 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-lg font-medium hover:from-pink-600 hover:to-pink-700 transition-all shadow hover:shadow-md whitespace-nowrap">
-                Subscribe
-              </button>
-            </div>
-          </div>
-        </div>
-
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-pink-200 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-600 mb-4 md:mb-0">

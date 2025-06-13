@@ -37,7 +37,7 @@ const LoginSignup = () => {
       : form;
 
     try {
-      const res = await axios.post(`http://localhost:5000${url}`, dataToSend, {
+      const res = await axios.post(`http://localhost:3000${url}`, dataToSend, {
         withCredentials: true,
       });
       showFlash(`${isLogin ? "Login" : "Signup"} Successful`, "success");
@@ -54,14 +54,14 @@ const LoginSignup = () => {
   };
 
   const handleGoogleLogin = () => {
-    window.open("http://localhost:5000/api/auth/google", "_self");
+    window.open("http://localhost:3000/api/auth/google", "_self");
   };
 
   // ✅ Check session after Google login
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/auth/me", {
+        const res = await axios.get("http://localhost:3000/api/auth/me", {
           withCredentials: true,
         });
         if (res.data && res.data._id) {

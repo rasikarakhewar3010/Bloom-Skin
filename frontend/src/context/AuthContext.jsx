@@ -5,9 +5,10 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  // On mount, check localStorage
   useEffect(() => {
-    const loggedIn = localStorage.getItem("isLoggedIn") === "true";
-    setIsLoggedIn(loggedIn);
+    const storedLogin = localStorage.getItem("isLoggedIn") === "true";
+    setIsLoggedIn(storedLogin);
   }, []);
 
   return (

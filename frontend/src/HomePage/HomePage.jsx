@@ -1,6 +1,6 @@
 import React from 'react';
 import { HeroSectionOne } from './HeroSectionOne';
-import { NavbarDemo } from './NavbarDemo';
+import { NavbarDemo } from '../NavbarDemo';
 import ScanIntro from './ScanIntro';
 import { StickyScrollRevealDemo } from './StickyScrollRevealDemo';
 import WhyChooseBloomSkin from './WhyChooseBloomSkin';

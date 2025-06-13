@@ -49,7 +49,7 @@ export function NavbarDemo() {
 
   const handleLogout = async () => {
     try {
-      await axios.get("http://localhost:5000/api/auth/logout", {
+      await axios.get("http://localhost:3000/api/auth/logout", {
         withCredentials: true,
       });
       localStorage.removeItem("isLoggedIn");
@@ -61,7 +61,7 @@ export function NavbarDemo() {
   };
 
   const navItems = [
-    { name: "AI Camera", link: "#features" },
+    { name: "AI Camera", link: "/aichat" },
     { name: "Guide", link: "/guide" },
     { name: "Contact", link: "/contact" },
   ];
@@ -85,9 +85,9 @@ export function NavbarDemo() {
               </Link>
             ) : (
               <>
-                <Link to="/profile">
+                {/* <Link to="/profile">
                   <NavbarButton variant="primary">Profile</NavbarButton>
-                </Link>
+                </Link> */}
                 <NavbarButton variant="primary" onClick={handleLogout}>
                   Logout
                 </NavbarButton>
@@ -132,7 +132,7 @@ export function NavbarDemo() {
                 </Link>
               ) : (
                 <>
-                  <Link to="/profile">
+                  {/* <Link to="/profile">
                     <NavbarButton
                       onClick={() => setIsMobileMenuOpen(false)}
                       variant="primary"
@@ -140,7 +140,7 @@ export function NavbarDemo() {
                     >
                       Profile
                     </NavbarButton>
-                  </Link>
+                  </Link> */}
                   <NavbarButton
                     onClick={() => {
                       handleLogout();

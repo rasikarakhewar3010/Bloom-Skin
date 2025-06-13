@@ -1,12 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { BackgroundLines } from "@/components/ui/background-lines";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
+import { useNavigate } from 'react-router-dom';
+
 
 export function HeroSectionOne() {
+  const navigate = useNavigate();
   const [displayText, setDisplayText] = useState('');
   const fullText = 'Bloom Skin';
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showCursor, setShowCursor] = useState(true);
+
+  const handleGetStartedClick = () => {
+    // You could do other things here first, like an API call
+    navigate('/aichat');
+  };
 
   // Typing effect
   useEffect(() => {
@@ -46,7 +54,7 @@ export function HeroSectionOne() {
         Experience a transformative journey that nurtures, heals, and rejuvenates your skin with every application.
       </p>
       <div className='z-10 mt-9 md:mt-12'>
-        <button className="p-[3px] relative group">
+        <button className="p-[3px] relative group" onClick={handleGetStartedClick} >
           <div className="absolute inset-0 bg-gradient-to-r from-[#FFC2D1] to-[#FB6F92] rounded-lg" />
           <div className="px-6 py-2 sm:px-8 sm:py-2 bg-neutral-900 rounded-[6px] relative group-hover:bg-transparent 
                          transition duration-200 text-white group-hover:text-black font-medium text-sm sm:text-base">

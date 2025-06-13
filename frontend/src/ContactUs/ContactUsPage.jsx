@@ -1,4 +1,4 @@
-import { NavbarDemo } from '@/HomePage/NavbarDemo';
+import { NavbarDemo } from '@/NavbarDemo';
 import React from 'react';
 import ContactUs from './ContactUs';
 import BloomSkinFooter from '@/HomePage/BloomSkinFooter';

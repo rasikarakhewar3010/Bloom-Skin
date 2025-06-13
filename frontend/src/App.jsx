@@ -48,7 +48,7 @@ function AppWrapper() {
         <Route path="/contact" element={<ContactUsPage />} />
         <Route path="/login" element={<LoginSignup />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
-        <Route path="/skin" element={<AIChatPage />} /> 
+        <Route path="/aichat" element={<AIChatPage />} /> 
 
         <Route path="*" element={<NotFoundPage />} /> 
       </Routes>

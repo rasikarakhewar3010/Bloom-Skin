@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "clean-start": "rm -rf node_modules/.vite && npm install && npm run dev"
   },
+    "proxy": "http://localhost:3000",
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
     "@splinetool/react-spline": "^4.0.0",

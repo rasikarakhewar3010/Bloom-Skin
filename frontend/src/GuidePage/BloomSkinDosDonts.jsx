@@ -185,15 +185,13 @@ const BloomSkinDosDonts = () => {
         <p className="text-gray-600 mb-6">
           A well-lit, front-facing photo with neutral expression and clear focus provides the most accurate analysis.
         </p>
-        <div className="aspect-video bg-gradient-to-r from-pink-100/30 to-cyan-100/30 rounded-lg flex items-center justify-center border border-dashed border-gray-300">
-          <div className="text-center p-6">
-            <svg className="w-12 h-12 text-gray-400 mx-auto" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path d="M3 7h18M5 7V5h14v2M12 11a3 3 0 100 6 3 3 0 000-6z" />
-              <path d="M4 17h16v2H4z" />
-            </svg>
-            <p className="mt-2 text-sm text-gray-500">Placeholder – ideal photo display here</p>
-          </div>
-        </div>
+ <div className="aspect-video bg-gray-200 rounded-lg overflow-hidden border border-gray-300">
+    <img
+      src="/images/idealImage.jpeg" // 2. USE THE IMPORTED IMAGE AS THE SOURCE
+      alt="Example of an ideal photo for skin analysis"
+      className="w-full h-full object-cover" // Ensures the image fills the container
+    />
+  </div>
       </motion.div>
     </section>
   );

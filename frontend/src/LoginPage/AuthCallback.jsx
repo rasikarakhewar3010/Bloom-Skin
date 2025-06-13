@@ -10,7 +10,7 @@ const AuthCallback = () => {
   useEffect(() => {
     const verify = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/auth/check-auth", {
+        const res = await axios.get("http://localhost:3000/api/auth/check-auth", {
           withCredentials: true,
         });
 
