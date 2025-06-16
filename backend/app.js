@@ -47,7 +47,10 @@ app.use((req, res, next) => {
 // ✅ Routes
 // ------------------------------
 app.use("/api/auth", require("./routes/auth"));
-app.use('/api/predict', predictRoutes);
+// app.use('/api/predict', predictRoutes);
+app.use('/api/predict', require('./routes/prediction.routes'));
+app.use('/api/history', require('./routes/history.routes')); // <-- ADD THIS LINE
+
 
 
 // ------------------------------

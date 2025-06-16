@@ -1,5 +1,7 @@
-flask
-flask-cors
+Flask
+Flask-Cors
 tensorflow
-pillow
 numpy
+Pillow
+opencv-python
+mtcnn

@@ -1,109 +1,119 @@
+# ==============================================================================
+# Skin Problem Classification API - app.py (ML Service)
+# ==============================================================================
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import tensorflow as tf
 import numpy as np
 from PIL import Image
 import io
+import cv2
+from mtcnn.mtcnn import MTCNN
+import os
 
-# --- Configuration ---
+# --- 1. CONFIGURATION & INITIALIZATION ---
 app = Flask(__name__)
-# CORS is not strictly needed in our proxy setup, but it doesn't hurt.
-# The browser only talks to the Node.js server, which handles CORS.
-CORS(app)  
+CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "http://localhost:5173"]}})
 
-# --- Load Model and Define Classes ---
+MODEL_PATH = './model/skin_problem_classifier_v1.h5'
+CONFIDENCE_THRESHOLD = 0.80
+
+CLASS_LABELS = ['Blackheads', 'Cyst', 'Papules', 'Pustules', 'Whiteheads']
+
+TREATMENT_INFO = {
+    'Blackheads': {'info': 'Blackheads are open comedones caused by clogged hair follicles...'},
+    'Cyst': {'info': 'Cystic acne is a severe, painful form located deep within the skin...'},
+    'Papules': {'info': 'Papules are small, red, tender bumps with no head...'},
+    'Pustules': {'info': 'Pustules are what many call pimples—red, inflamed bumps...'},
+    'Whiteheads': {'info': 'Whiteheads are closed comedones...'},
+    'Clear Skin': {'info': 'Our analysis did not find strong evidence of a skin problem...'},
+    'Invalid Image': {'info': 'We could not detect a clear face or process the image...'}
+}
+
+# --- 2. LOAD MODELS ON STARTUP ---
+model = None
+face_detector = None
+
 try:
-    # Load your trained acne classification model
-    model = tf.keras.models.load_model('./model/acne_classifier_model.h5')
-    # Acne class names MUST match the order your model was trained on
-    classes = ['Blackheads', 'Cyst', 'Papules', 'Pustules', 'Whiteheads']
-    print("✅ Model loaded successfully.")
+    if os.path.exists(MODEL_PATH):
+        model = tf.keras.models.load_model(MODEL_PATH)
+        face_detector = MTCNN()
+        print("✅ Model and face detector loaded successfully.")
+    else:
+        print(f"❌ Model not found at path: {MODEL_PATH}")
 except Exception as e:
-    print(f"❌ Error loading model: {e}")
-    model = None # Set model to None if loading fails
+    print(f"❌ Failed to load model or detector: {e}")
 
-# Confidence threshold: if max prediction is below this, classify as "Unknown"
-CONFIDENCE_THRESHOLD = 0.60 
-
-# --- Image Preprocessing Function ---
-def preprocess_image(image_bytes):
-    """
-    Takes image bytes, opens, resizes, and normalizes the image
-    to the format the model expects.
-    """
+# --- 3. CORE LOGIC: IMAGE ANALYSIS ---
+def analyze_skin_image(image_bytes):
     try:
-        # Open the image from byte stream and ensure it's in RGB format
         img = Image.open(io.BytesIO(image_bytes)).convert('RGB')
-        # Resize to the model's expected input size (e.g., 224x224)
-        img = img.resize((224, 224))
-        # Convert image to a numpy array and normalize pixel values to [0, 1]
-        img_array = np.array(img) / 255.0
-        # Add a batch dimension (e.g., from (224, 224, 3) to (1, 224, 224, 3))
-        return np.expand_dims(img_array, axis=0)
-    except Exception as e:
-        # If any error occurs during preprocessing (e.g., corrupt file)
-        print(f"Error preprocessing image: {e}")
-        return None
+        img_rgb = np.array(img)
+    except Exception:
+        return {
+            'class': 'Invalid Image',
+            'confidence': 1.0,
+            'info': TREATMENT_INFO['Invalid Image']['info']
+        }, 400
 
-# --- API Endpoint ---
+    detections = face_detector.detect_faces(img_rgb)
+    image_to_process = img_rgb
+
+    if detections:
+        print("✅ Face detected. Cropping...")
+        x, y, width, height = detections[0]['box']
+        x1, y1 = max(0, x - 20), max(0, y - 20)
+        x2, y2 = min(img_rgb.shape[1], x + width + 20), min(img_rgb.shape[0], y + height + 20)
+        image_to_process = img_rgb[y1:y2, x1:x2]
+    else:
+        print("⚠️ No face detected. Using full image.")
+
+    try:
+        resized_image = cv2.resize(image_to_process, (224, 224))
+        img_array = resized_image / 255.0
+        input_tensor = np.expand_dims(img_array, axis=0)
+
+        prediction = model.predict(input_tensor)
+        confidence = float(np.max(prediction))
+        class_index = np.argmax(prediction)
+
+        predicted_class = CLASS_LABELS[class_index] if confidence >= CONFIDENCE_THRESHOLD else "Clear Skin"
+
+        return {
+            'class': predicted_class,
+            'confidence': confidence,
+            'info': TREATMENT_INFO[predicted_class]['info']
+        }, 200
+    except Exception as e:
+        print(f"❌ Image processing failed: {e}")
+        return {
+            'class': 'Invalid Image',
+            'confidence': 0.0,
+            'info': 'Something went wrong while analyzing the image.'
+        }, 500
+
+# --- 4. API ROUTES ---
 @app.route('/predict', methods=['POST'])
 def predict():
-    # Immediately check if the model was loaded correctly on startup
-    if model is None:
-        return jsonify({'error': 'Model is not available. Please check server logs.'}), 503 # 503 Service Unavailable
+    if model is None or face_detector is None:
+        return jsonify({'error': 'Model or face detector not loaded.'}), 503
 
-    # 1. Validate the incoming request
-    # Check if the 'image' key is in the files part of the request
     if 'image' not in request.files:
-        return jsonify({'error': 'No image file found in the request. The key must be "image".'}), 400
+        return jsonify({'error': 'No image uploaded in the request.'}), 400
 
     file = request.files['image']
-
-    # Check if a file was actually selected
     if file.filename == '':
-        return jsonify({'error': 'No file selected.'}), 400
-    
-    # 2. Read and Preprocess the Image
-    # Read the file's content into bytes
-    image_bytes = file.read()
-    input_tensor = preprocess_image(image_bytes)
+        return jsonify({'error': 'Empty file submitted.'}), 400
 
-    # If preprocessing fails, it returns None
-    if input_tensor is None:
-        return jsonify({'error': 'Invalid or corrupt image file. Please try another.'}), 400
-
-    # 3. Make Prediction
     try:
-        prediction = model.predict(input_tensor)
-        
-        # Get the highest confidence score and the index of the predicted class
-        confidence = float(np.max(prediction))
-        predicted_index = np.argmax(prediction)
-
-        # 4. Handle Low Confidence
-        # If the model is not confident enough, we return a successful response
-        # but with a special class 'Unknown' for the frontend to handle.
-        if confidence < CONFIDENCE_THRESHOLD:
-            print(f"Low confidence prediction ({confidence:.2f}). Returning 'Unknown'.")
-            return jsonify({
-                'class': 'Unknown',
-                'confidence': confidence # CRITICAL: Return as a number
-            })
-
-        # 5. Format and Return Successful Prediction
-        predicted_class = classes[predicted_index]
-        print(f"Prediction successful: {predicted_class} with confidence {confidence:.2f}")
-
-        return jsonify({
-            'class': predicted_class,
-            'confidence': confidence # CRITICAL: Return as a number, not a string
-        })
-
+        image_bytes = file.read()
+        result, status = analyze_skin_image(image_bytes)
+        return jsonify(result), status
     except Exception as e:
-        print(f"❌ Error during model prediction: {e}")
-        return jsonify({'error': 'An internal error occurred during prediction.'}), 500
+        print(f"❌ Error during /predict request: {e}")
+        return jsonify({'error': 'Internal server error.'}), 500
 
-
-# --- Run the App ---
+# --- 5. RUN APP ---
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=False)

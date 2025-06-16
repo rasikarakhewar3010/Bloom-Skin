@@ -14,6 +14,7 @@ import AuthCallback from "./LoginPage/AuthCallback"; // 👈 import this
 
 import { AuthProvider } from "./context/AuthContext"; // ✅ NEW
 import AIChatPage from './AIChatPage/AIChatPage';
+import Page from './HistoryPage/Page'; // history page
 
 
 function AppWrapper() {
@@ -49,6 +50,7 @@ function AppWrapper() {
         <Route path="/login" element={<LoginSignup />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/aichat" element={<AIChatPage />} /> 
+        <Route path="/history" element={<Page />} /> 
 
         <Route path="*" element={<NotFoundPage />} /> 
       </Routes>

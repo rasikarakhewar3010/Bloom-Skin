@@ -30,7 +30,6 @@ export function NavbarDemo() {
 
     checkLoginStatus();
 
-    // Listen for login state changes across tabs or Google popup
     const handleStorageChange = () => {
       checkLoginStatus();
     };
@@ -60,11 +59,17 @@ export function NavbarDemo() {
     }
   };
 
-  const navItems = [
+  // Define base navigation items
+  const baseNavItems = [
     { name: "AI Camera", link: "/aichat" },
     { name: "Guide", link: "/guide" },
     { name: "Contact", link: "/contact" },
   ];
+
+  // Conditionally add "History" only if logged in
+  const navItems = isLoggedIn
+    ? [...baseNavItems, { name: "History", link: "/history" }]
+    : baseNavItems;
 
   return (
     <div className="relative w-full pt-8 z-60">
@@ -84,14 +89,9 @@ export function NavbarDemo() {
                 <NavbarButton variant="secondary">Login</NavbarButton>
               </Link>
             ) : (
-              <>
-                {/* <Link to="/profile">
-                  <NavbarButton variant="primary">Profile</NavbarButton>
-                </Link> */}
-                <NavbarButton variant="primary" onClick={handleLogout}>
-                  Logout
-                </NavbarButton>
-              </>
+              <NavbarButton variant="primary" onClick={handleLogout}>
+                Logout
+              </NavbarButton>
             )}
           </div>
         </NavBody>
@@ -119,6 +119,7 @@ export function NavbarDemo() {
                 <span className="block">{item.name}</span>
               </a>
             ))}
+
             <div className="flex w-full flex-col gap-4 mt-4">
               {!isLoggedIn ? (
                 <Link to="/login">
@@ -131,27 +132,16 @@ export function NavbarDemo() {
                   </NavbarButton>
                 </Link>
               ) : (
-                <>
-                  {/* <Link to="/profile">
-                    <NavbarButton
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      variant="primary"
-                      className="w-full"
-                    >
-                      Profile
-                    </NavbarButton>
-                  </Link> */}
-                  <NavbarButton
-                    onClick={() => {
-                      handleLogout();
-                      setIsMobileMenuOpen(false);
-                    }}
-                    variant="primary"
-                    className="w-full"
-                  >
-                    Logout
-                  </NavbarButton>
-                </>
+                <NavbarButton
+                  onClick={() => {
+                    handleLogout();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  variant="primary"
+                  className="w-full"
+                >
+                  Logout
+                </NavbarButton>
               )}
             </div>
           </MobileNavMenu>
