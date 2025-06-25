@@ -1,0 +1,14 @@
+config:
+  target: "http://localhost:5000"  # Change to your deployed backend URL
+  phases:
+    - duration: 60
+      arrivalRate: 10     # Start with 10 users/sec
+    - duration: 60
+      arrivalRate: 50     # Then 50 users/sec
+    - duration: 60
+      arrivalRate: 100    # Spike to 100 users/sec
+
+scenarios:
+  - flow:
+      - get:
+          url: "/api/skin/analysis"  # Replace with your actual API route

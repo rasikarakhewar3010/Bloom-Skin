@@ -5,7 +5,8 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const passport = require("passport");
-const predictRoutes = require('./routes/predict');
+const MongoStore = require("connect-mongo");
+
 dotenv.config();
 require("./config/passport");
 
@@ -17,26 +18,36 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
+// ✅ CORS: allow frontend to send cookies
 app.use(cors({
-  origin: process.env.FRONTEND_URL, // e.g. http://localhost:3000
+  origin: process.env.FRONTEND_URL, // e.g. http://localhost:5173
   credentials: true,
 }));
 
-app.use(session({
-  secret: process.env.SESSION_SECRET || "keyboard cat",
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: process.env.NODE_ENV === "production",
-    httpOnly: true,
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-  },
-}));
+// ✅ Express Session with Mongo Store
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "keyboard cat",
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URI,
+      collectionName: "sessions",
+    }),
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+      secure: process.env.NODE_ENV === "production", // true in prod only
+      httpOnly: true,
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    },
+  })
+);
 
+// ✅ Passport
 app.use(passport.initialize());
 app.use(passport.session());
 
-// ✅ Debug session/user in development
+// ✅ Debug Session (optional for dev)
 app.use((req, res, next) => {
   console.log("Session:", req.session);
   console.log("User:", req.user);
@@ -47,14 +58,11 @@ app.use((req, res, next) => {
 // ✅ Routes
 // ------------------------------
 app.use("/api/auth", require("./routes/auth"));
-// app.use('/api/predict', predictRoutes);
-app.use('/api/predict', require('./routes/prediction.routes'));
-app.use('/api/history', require('./routes/history.routes')); // <-- ADD THIS LINE
-
-
+app.use("/api/predict", require("./routes/prediction.routes"));
+app.use("/api/history", require("./routes/history.routes"));
 
 // ------------------------------
-// ✅ Connect to MongoDB & Start Server
+// ✅ MongoDB & Start Server
 // ------------------------------
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
@@ -62,4 +70,4 @@ mongoose.connect(process.env.MONGO_URI)
       console.log(`Server running at http://localhost:${process.env.PORT}`);
     });
   })
-  .catch((err) => console.error(" DB connection error:", err));
+  .catch((err) => console.error("❌ DB connection error:", err));

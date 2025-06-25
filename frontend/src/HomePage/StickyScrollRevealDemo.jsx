@@ -38,7 +38,7 @@ const content = [
     content: (
       <div className="flex h-full w-full items-center justify-center text-white">
         <img
-          src="https://files.myglamm.com/site-images/original/What-Causes-Blackheads-On-The-Nose.png"
+          src="/images/blackh.avif"
           className="h-full w-full object-cover"
           alt="Blackhead treatment illustration"
         />
