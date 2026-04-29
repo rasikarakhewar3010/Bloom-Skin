@@ -1,11 +1,11 @@
 services:
   # Backend Node.js API
   - type: web
-    name: bloomskin-api
+    name: bloomskin-backend
     env: node
     rootDir: backend
     buildCommand: npm install
-    startCommand: node app.js
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
@@ -14,7 +14,7 @@ services:
       - key: FRONTEND_URL
         value: https://bloomskin.vercel.app
       - key: GOOGLE_CALLBACK_URL
-        value: https://bloomskin-api.onrender.com/api/auth/google/callback
+        value: https://bloom-skin-backend.onrender.com/api/auth/google/callback
       - key: ML_SERVICE_URL
         value: https://bloomskin-ml.onrender.com
       # Note: For security, sensitive variables like MONGO_URI, SESSION_SECRET, 
