@@ -1,7 +1,7 @@
 services:
   # Backend Node.js API
   - type: web
-    name: bloomskin-backend
+    name: bloom-skin-backend
     env: node
     rootDir: backend
     buildCommand: npm install
