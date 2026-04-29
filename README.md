@@ -1,151 +1,107 @@
-# BloomSkin 🌸 — Your AI-Powered Dermatologist
+<div align="center">
+  <img src="frontend/public/images/Routine_image.png" width="200" alt="BloomSkin Logo" style="border-radius: 2rem; margin-bottom: 2rem;">
+  <h1>BloomSkin 🌸</h1>
+  <p><strong>The Future of AI-Powered Dermatology</strong></p>
+  <p><i>Transforming any smartphone into a clinical-grade skin diagnostic tool.</i></p>
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![React](https://img.shields.io/badge/frontend-React-61DAFB.svg?logo=react&logoColor=black)
-![Node.js](https://img.shields.io/badge/backend-Node.js-339933.svg?logo=node.js&logoColor=white)
-![Python](https://img.shields.io/badge/ML-Python-3776AB.svg?logo=python&logoColor=white)
-![TensorFlow](https://img.shields.io/badge/AI-TensorFlow-FF6F00.svg?logo=tensorflow&logoColor=white)
-
-**BloomSkin** is a state-of-the-art dermatological analysis platform that transforms your smartphone into a professional skin diagnostic tool. By merging deep learning (CNNs) with a medical-grade knowledge base, BloomSkin provides users with instant, accurate, and personalized skin health journeys.
+  <div>
+    <img src="https://img.shields.io/badge/Production-Live-success?style=for-the-badge&logo=vercel" alt="Production">
+    <img src="https://img.shields.io/badge/Frontend-React_19-61DAFB?style=for-the-badge&logo=react" alt="React">
+    <img src="https://img.shields.io/badge/Backend-Node.js-339933?style=for-the-badge&logo=node.js" alt="Node">
+    <img src="https://img.shields.io/badge/Intelligence-TensorFlow-FF6F00?style=for-the-badge&logo=tensorflow" alt="AI">
+  </div>
+</div>
 
 ---
 
-## 🏗️ Product Architecture
+## 🔬 The Vision
+BloomSkin isn't just an app; it's a personalized skincare journey. By combining **Deep Learning (CNNs)** with a medical-grade knowledge base, we provide sub-second analysis and adaptive routines that evolve with your skin.
 
-BloomSkin is built on a high-performance distributed architecture designed for scalability and sub-second analysis.
+### 🌐 Live Ecosystem
+- **Frontend Hub:** [https://bloomskin.vercel.app/](https://bloomskin.vercel.app/)
+- **API Engine:** [https://bloom-skin-backend.onrender.com/](https://bloom-skin-backend.onrender.com/)
 
-### System Context
+---
+
+## 🌟 Key Pillars
+
+### 1. Precision AI Scanning
+Our custom-trained **Convolutional Neural Network** detects Acne, Cysts, Papules, and Pustules with clinical-grade accuracy. Integrated MTCNN face detection ensures perfect scan framing every time.
+
+### 2. High-Fidelity Dashboard
+A "Better than Premium" data hub tracking your **Bloom Score**, severity trends, and scan streaks. Real-time sparklines visualize your improvement over time.
+
+### 3. Smart Routine Logic
+A 7-day adaptive planner that synchronizes with your latest scan. If your skin changes, your routine changes automatically.
+
+---
+
+## 🏗️ Architecture
+
 ```mermaid
-graph LR
-    User((User))
-    subgraph "BloomSkin Platform"
-        WebApp[React SPA]
-        API[Express Gateway]
-        ML[Python ML Engine]
-    end
-    subgraph "Data & Media"
-        Cloudinary[Media Storage]
-        Mongo[(MongoDB Atlas)]
-    end
-
-    User -->|Analyzes Skin| WebApp
-    WebApp --> API
-    API -->|Condition Analysis| ML
-    API -->|Persistence| Mongo
-    API -->|Image Optimization| Cloudinary
+graph TD
+    User((User)) -->|Photo| React[React 19 SPA]
+    React -->|API Request| Express[Node.js Express Gateway]
+    Express -->|Inference| Flask[Python ML Engine]
+    Flask -->|TensorFlow| Model[.h5 Weights]
+    Express -->|Persistence| Mongo[(MongoDB Atlas)]
+    Express -->|Media| Cloud[(Cloudinary)]
 ```
 
 ---
 
-## 🌟 Advanced Product Features
+## 🛠️ Tech Stack
 
-- **🔬 Precision AI Scan**: Uses a custom-trained Convolutional Neural Network (CNN) to detect 5+ skin conditions (Acne, Cyst, Papules, Pustules, etc.) with high confidence.
-* **📈 Skin Health Dashboard**: A centralized hub that tracks your "Bloom Score," severity trends, and scan frequency using interactive charts.
-* **🧬 Dynamic Recommendation Engine**: A weighted logic system that analyzes your scan history to recommend specific ingredients and products tailored to your skin's current state.
-* **🗓️ Smart Routine Planner**: Automatically generates a 7-day personalized skincare routine (Morning & Evening) based on your latest AI diagnostics.
-* **📸 Face-Aware Analysis**: Integrated MTCNN face detection to ensure scans are taken correctly, reducing false positives.
-* **🔐 Enterprise-Grade Auth**: Secure Google OAuth 2.0 and JWT-based session management.
-* **📱 Premium UI/UX**: A sleek, dark-mode-ready interface built with Tailwind CSS, Lucide icons, and fluid Framer Motion animations.
-
----
-
-## 🛠️ Technical Tech Stack
-
-### Frontend
-- **React 19 (Vite)**: Ultra-fast SPA framework.
-- **Tailwind CSS v4**: Modern utility-first styling.
-- **Framer Motion**: Premium micro-animations.
-- **Lucide React**: Vector-perfect product iconography.
-
-### Backend & ML
-- **Node.js & Express**: High-concurrency API gateway.
-- **MongoDB Atlas**: Scalable NoSQL document storage.
-- **Flask (Python)**: High-performance ML serving layer.
-- **TensorFlow/Keras**: Core deep learning analysis models.
+| Layer | Technologies |
+|---|---|
+| **Frontend** | React 19, Vite, Tailwind CSS v4, Framer Motion, Lucide Icons |
+| **Backend** | Node.js, Express, Passport.js (OAuth 2.0), JWT, Mongoose |
+| **Machine Learning** | Python, TensorFlow/Keras, Flask, OpenCV, MTCNN |
+| **DevOps** | Vercel (Frontend), Render (Backend/ML), GitHub Actions |
 
 ---
 
-## ⚡ Quick Start
+## ⚡ Deployment (Unified Monorepo)
 
-### 1. Repository Setup
+BloomSkin is built as a **Monorepo**. Deploying changes to both the frontend and backend is as simple as one push from the root folder.
+
+### 1. Initial Setup
 ```bash
 git clone https://github.com/rasikarakhewar3010/Bloom-Skin.git
 cd Bloom-Skin
 ```
 
-### 2. Environment Configuration
-For both the `backend/` and `frontend/` directories, copy the provided `.env.example` file to create your own `.env` file and fill in your credentials:
-
+### 2. Unified Push
 ```bash
-# In backend/
-cp .env.example .env
-
-# In frontend/
-cp .env.example .env
-
-# In bloom-skin-ml/
-cp .env.example .env
+git add .
+git commit -m "feat: updated dashboard logic"
+git push
 ```
 
-### 3. Local Installation
-```bash
-# Start Backend
-cd backend && npm install && npm start
-
-# Start ML Engine (Python venv required)
-cd bloom-skin-ml && pip install -r requirements.txt && python app.py
-
-# Start Frontend
-cd frontend && npm install && npm run dev
-```
+> [!TIP]
+> **Render (Backend):** Use the `render.yaml` Blueprint or set `rootDir: backend` in manual settings.
+> **Vercel (Frontend):** Set the **Root Directory** to `frontend` in Project Settings.
 
 ---
 
-## 📂 Architecture Overview
-
+## 📂 Project Structure
 ```text
 BloomSkin/
-├── backend/
-│   ├── config/              # Passport, Cloudinary configs
-│   ├── controllers/         # Business logic (auth, predict, dashboard, etc.)
-│   ├── data/                # Recommendation knowledge base
-│   ├── middleware/           # Auth guard, rate limiters
-│   ├── models/              # Mongoose schemas (User, History)
-│   ├── routes/              # Express route definitions
-│   └── app.js               # Entry point with security middleware
-├── frontend/
-│   ├── src/
-│   │   ├── components/      # Shared UI (ProtectedRoute, NotFound, etc.)
-│   │   ├── context/         # Auth state management
-│   │   ├── HomePage/        # Landing page sections
-│   │   └── [Feature]Page/   # Dashboard, History, Routine, etc.
-│   └── index.html           # SEO-optimized entry point
-└── bloom-skin-ml/
-    ├── model/               # TensorFlow .h5 model
-    └── app.py               # Flask ML inference service
+├── backend/             # Node.js API & Business Logic
+├── frontend/            # React 19 Boutique UI
+├── bloom-skin-ml/       # TensorFlow Inference Service
+└── render.yaml          # Unified Deployment Blueprint
 ```
 
 ---
 
-## 🔐 Security Architecture
-
-BloomSkin implements **defense-in-depth** security across all layers:
-
-| Layer | Implementation |
-|---|---|
-| **HTTP Headers** | `helmet` — XSS protection, HSTS, CSP, MIME sniffing prevention |
-| **Rate Limiting** | `express-rate-limit` — Per-route limits (auth: 15/15min, uploads: 5/min, exports: 3/hr) |
-| **Authentication** | Passport.js with Google OAuth 2.0 + Local strategy, session-based with MongoStore |
-| **Route Protection** | Frontend `<ProtectedRoute>` component guards all authenticated pages |
-| **Input Validation** | Server-side email/password validation, file type/size filtering (5MB max) |
-| **Session Security** | HttpOnly cookies, SameSite policy, secure flag in production |
-| **File Upload Security** | Multer MIME type filter + size limit + Cloudinary virus scanning |
-| **Error Handling** | Global error handler prevents stack trace leaks in production |
-| **SSL/TLS** | Full certificate verification on all outbound HTTPS requests |
+## 🔐 Security Standards
+- **Defense-in-Depth:** Helmet.js headers & Rate limiting.
+- **Identity:** Secure Google OAuth 2.0 & HttpOnly Session Cookies.
+- **Safety:** Cloudinary virus scanning & Multer MIME type filtering.
 
 ---
 
-*© 2026 BloomSkin Inc. Developed for precision skin health.*
-
-
-
+<div align="center">
+  <p><i>© 2026 BloomSkin Inc. Developed for precision skin health.</i></p>
+</div>
