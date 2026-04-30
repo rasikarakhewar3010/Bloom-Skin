@@ -24,6 +24,12 @@ exports.forgotPassword = async (req, res) => {
       return res.status(400).json({ error: "Email is required." });
     }
 
+    // Pre-flight: ensure email service is configured
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      console.error("Forgot password error: EMAIL_USER or EMAIL_PASS environment variables are not set.");
+      return res.status(500).json({ error: "Email service is not configured. Please contact support." });
+    }
+
     const trimmedEmail = email.trim().toLowerCase();
     const user = await User.findOne({ email: trimmedEmail });
 
@@ -50,11 +56,27 @@ exports.forgotPassword = async (req, res) => {
     user.resetPasswordExpires = Date.now() + 60 * 60 * 1000; // 1 hour
     await user.save();
 
-    // Build reset URL (frontend page)
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+    // Build reset URL (frontend page) — use production URL as fallback
+    const frontendUrl = process.env.FRONTEND_URL && process.env.FRONTEND_URL !== "http://localhost:5173"
+      ? process.env.FRONTEND_URL
+      : "https://bloomskin.vercel.app";
+    const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
 
-    // Send email
+    // Send email with connection verification
     const transporter = createTransporter();
+    
+    // Verify SMTP connection before sending (helps catch auth errors early)
+    try {
+      await transporter.verify();
+    } catch (verifyErr) {
+      console.error("SMTP connection verification failed:", verifyErr.message);
+      // Clean up the token since we can't send the email
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+      await user.save();
+      return res.status(500).json({ error: "Email service is temporarily unavailable. Please try again later." });
+    }
+
     await transporter.sendMail({
       from: `"Bloom Skin" <${process.env.EMAIL_USER}>`,
       to: user.email,
@@ -86,7 +108,8 @@ exports.forgotPassword = async (req, res) => {
       message: "If an account with that email exists, a password reset link has been sent.",
     });
   } catch (err) {
-    console.error("Forgot password error:", err);
+    console.error("Forgot password error:", err.message || err);
+    console.error("Full error details:", JSON.stringify(err, Object.getOwnPropertyNames(err)));
     res.status(500).json({ error: "Failed to process password reset request. Please try again." });
   }
 };
