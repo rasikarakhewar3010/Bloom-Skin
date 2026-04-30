@@ -3,15 +3,31 @@ const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
 const User = require("../models/User");
 
-// --- Email transporter ---
+// --- Email transporter with timeouts ---
 const createTransporter = () => {
   return nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false, // use STARTTLS
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
+    connectionTimeout: 10000,  // 10s to establish connection
+    greetingTimeout: 10000,    // 10s for SMTP greeting
+    socketTimeout: 15000,      // 15s for socket inactivity
+    logger: process.env.NODE_ENV !== "production", // log SMTP in dev
   });
+};
+
+// Helper: wraps a promise with a timeout so it never hangs
+const withTimeout = (promise, ms, errorMsg) => {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(errorMsg)), ms)
+    ),
+  ]);
 };
 
 // @desc    Send password reset link to user's email
@@ -27,6 +43,7 @@ exports.forgotPassword = async (req, res) => {
     // Pre-flight: ensure email service is configured
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
       console.error("Forgot password error: EMAIL_USER or EMAIL_PASS environment variables are not set.");
+      console.error("EMAIL_USER exists:", !!process.env.EMAIL_USER, "| EMAIL_PASS exists:", !!process.env.EMAIL_PASS);
       return res.status(500).json({ error: "Email service is not configured. Please contact support." });
     }
 
@@ -62,48 +79,70 @@ exports.forgotPassword = async (req, res) => {
       : "https://bloomskin.vercel.app";
     const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
 
-    // Send email with connection verification
+    // Send email with connection verification and timeouts
     const transporter = createTransporter();
-    
-    // Verify SMTP connection before sending (helps catch auth errors early)
+
+    // Verify SMTP connection (with 10s timeout so it never hangs)
     try {
-      await transporter.verify();
+      await withTimeout(
+        transporter.verify(),
+        10000,
+        "SMTP verify timed out after 10s"
+      );
+      console.log("SMTP verification successful");
     } catch (verifyErr) {
       console.error("SMTP connection verification failed:", verifyErr.message);
       // Clean up the token since we can't send the email
       user.resetPasswordToken = undefined;
       user.resetPasswordExpires = undefined;
       await user.save();
+      transporter.close();
       return res.status(500).json({ error: "Email service is temporarily unavailable. Please try again later." });
     }
 
-    await transporter.sendMail({
-      from: `"Bloom Skin" <${process.env.EMAIL_USER}>`,
-      to: user.email,
-      subject: "Reset Your Bloom Skin Password",
-      html: `
-        <div style="font-family: 'Segoe UI', sans-serif; max-width: 520px; margin: 0 auto; padding: 32px; background: #fff5f7; border-radius: 16px;">
-          <h2 style="color: #ec4899; margin-bottom: 8px;">Bloom Skin</h2>
-          <p style="color: #374151; font-size: 15px;">Hi <strong>${user.name || "there"}</strong>,</p>
-          <p style="color: #374151; font-size: 15px;">
-            We received a request to reset your password. Click the button below to create a new one:
-          </p>
-          <div style="text-align: center; margin: 28px 0;">
-            <a href="${resetUrl}" 
-               style="display: inline-block; background: linear-gradient(to right, #ec4899, #a855f7); color: #fff; 
-                      padding: 12px 32px; border-radius: 999px; text-decoration: none; font-weight: 600; font-size: 15px;">
-              Reset Password
-            </a>
-          </div>
-          <p style="color: #6b7280; font-size: 13px;">
-            This link expires in <strong>1 hour</strong>. If you didn't request this, please ignore this email.
-          </p>
-          <hr style="border: none; border-top: 1px solid #fce7f3; margin: 24px 0;" />
-          <p style="color: #9ca3af; font-size: 12px; text-align: center;">Bloom Skin &mdash; Your skin's best companion</p>
-        </div>
-      `,
-    });
+    // Send the email (with 20s timeout)
+    try {
+      await withTimeout(
+        transporter.sendMail({
+          from: `"Bloom Skin" <${process.env.EMAIL_USER}>`,
+          to: user.email,
+          subject: "Reset Your Bloom Skin Password",
+          html: `
+            <div style="font-family: 'Segoe UI', sans-serif; max-width: 520px; margin: 0 auto; padding: 32px; background: #fff5f7; border-radius: 16px;">
+              <h2 style="color: #ec4899; margin-bottom: 8px;">Bloom Skin</h2>
+              <p style="color: #374151; font-size: 15px;">Hi <strong>${user.name || "there"}</strong>,</p>
+              <p style="color: #374151; font-size: 15px;">
+                We received a request to reset your password. Click the button below to create a new one:
+              </p>
+              <div style="text-align: center; margin: 28px 0;">
+                <a href="${resetUrl}" 
+                   style="display: inline-block; background: linear-gradient(to right, #ec4899, #a855f7); color: #fff; 
+                          padding: 12px 32px; border-radius: 999px; text-decoration: none; font-weight: 600; font-size: 15px;">
+                  Reset Password
+                </a>
+              </div>
+              <p style="color: #6b7280; font-size: 13px;">
+                This link expires in <strong>1 hour</strong>. If you didn't request this, please ignore this email.
+              </p>
+              <hr style="border: none; border-top: 1px solid #fce7f3; margin: 24px 0;" />
+              <p style="color: #9ca3af; font-size: 12px; text-align: center;">Bloom Skin &mdash; Your skin's best companion</p>
+            </div>
+          `,
+        }),
+        20000,
+        "Email send timed out after 20s"
+      );
+    } catch (sendErr) {
+      console.error("Email send failed:", sendErr.message);
+      // Clean up the token since email didn't go out
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+      await user.save();
+      transporter.close();
+      return res.status(500).json({ error: "Failed to send reset email. Please try again later." });
+    }
 
+    transporter.close();
     res.json({
       message: "If an account with that email exists, a password reset link has been sent.",
     });

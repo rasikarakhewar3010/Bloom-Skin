@@ -102,6 +102,47 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'healthy', timestamp: Date.now() });
 });
 
+// Temporary diagnostic endpoint — check email service configuration
+// REMOVE THIS AFTER DEBUGGING
+app.get('/health/email-check', async (req, res) => {
+  const nodemailer = require("nodemailer");
+  const result = {
+    emailUserSet: !!process.env.EMAIL_USER,
+    emailPassSet: !!process.env.EMAIL_PASS,
+    emailUserValue: process.env.EMAIL_USER ? process.env.EMAIL_USER.substring(0, 5) + "***" : "NOT SET",
+    frontendUrl: process.env.FRONTEND_URL || "NOT SET",
+    nodeEnv: process.env.NODE_ENV || "NOT SET",
+  };
+
+  // Test SMTP connection if credentials exist
+  if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+    try {
+      const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 587,
+        secure: false,
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
+        },
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 10000,
+      });
+      await transporter.verify();
+      result.smtpStatus = "CONNECTED";
+      transporter.close();
+    } catch (err) {
+      result.smtpStatus = "FAILED";
+      result.smtpError = err.message;
+    }
+  } else {
+    result.smtpStatus = "SKIPPED — credentials missing";
+  }
+
+  res.json(result);
+});
+
 // ------------------------------
 // ✅ Global Error Handler
 // ------------------------------

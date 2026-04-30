@@ -23,12 +23,16 @@ const ForgotPassword = () => {
     try {
       const res = await axios.post(`${baseUrl}/api/auth/forgot-password`, { email: email.trim() }, {
         withCredentials: true,
+        timeout: 30000, // 30s timeout so UI never hangs
       });
       setMessage({ text: res.data.message, type: "success" });
       setEmail("");
     } catch (err) {
+      const errorMsg = err.code === "ECONNABORTED"
+        ? "Request timed out. The server may be busy — please try again in a moment."
+        : err.response?.data?.error || "Something went wrong. Please try again.";
       setMessage({
-        text: err.response?.data?.error || "Something went wrong. Please try again.",
+        text: errorMsg,
         type: "error",
       });
     } finally {
