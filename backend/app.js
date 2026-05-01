@@ -106,36 +106,38 @@ app.get('/health', (req, res) => {
 // REMOVE THIS AFTER DEBUGGING
 app.get('/health/email-check', async (req, res) => {
   const result = {
-    resendApiKeySet: !!process.env.RESEND_API_KEY,
-    resendFromEmail: process.env.RESEND_FROM_EMAIL || "NOT SET (will use default onboarding@resend.dev)",
+    googleClientIdSet: !!process.env.GOOGLE_CLIENT_ID,
+    googleClientSecretSet: !!process.env.GOOGLE_CLIENT_SECRET,
+    googleRefreshTokenSet: !!process.env.GOOGLE_REFRESH_TOKEN,
+    emailUserSet: !!process.env.EMAIL_USER,
     frontendUrl: process.env.FRONTEND_URL || "NOT SET",
     nodeEnv: process.env.NODE_ENV || "NOT SET",
   };
 
-  // Test Resend API connectivity
-  if (process.env.RESEND_API_KEY) {
+  // Test Gmail API connectivity
+  if (process.env.GOOGLE_REFRESH_TOKEN && process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
     try {
-      const { Resend } = require("resend");
-      const resend = new Resend(process.env.RESEND_API_KEY);
-      const { data, error } = await resend.domains.list();
-      if (error) {
-        // "restricted to only send emails" means the key IS valid, just send-only permissions
-        if (error.message && error.message.includes("restricted")) {
-          result.resendStatus = "CONNECTED (send-only key)";
-        } else {
-          result.resendStatus = "API_KEY_INVALID";
-          result.resendError = error.message || JSON.stringify(error);
-        }
+      const { google } = require("googleapis");
+      const oAuth2Client = new google.auth.OAuth2(
+        process.env.GOOGLE_CLIENT_ID,
+        process.env.GOOGLE_CLIENT_SECRET,
+        "https://developers.google.com/oauthplayground"
+      );
+      oAuth2Client.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN });
+      
+      // Force token refresh test
+      const { token } = await oAuth2Client.getAccessToken();
+      if (token) {
+        result.gmailApiStatus = "CONNECTED (Token successfully generated)";
       } else {
-        result.resendStatus = "CONNECTED (full access)";
-        result.domains = data?.data?.map(d => d.name) || [];
+        result.gmailApiStatus = "FAILED (No token generated)";
       }
     } catch (err) {
-      result.resendStatus = "FAILED";
-      result.resendError = err.message;
+      result.gmailApiStatus = "FAILED";
+      result.gmailApiError = err.message;
     }
   } else {
-    result.resendStatus = "SKIPPED — RESEND_API_KEY not set";
+    result.gmailApiStatus = "SKIPPED — Missing Google OAuth credentials";
   }
 
   res.json(result);

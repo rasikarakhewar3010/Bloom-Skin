@@ -2,18 +2,33 @@ const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 
-// --- Email sender using Resend HTTP API (works on Render free tier) ---
-// Render blocks SMTP ports (25, 465, 587), so we use Resend's HTTP API instead.
-const { Resend } = require("resend");
+// --- Email sender using Google Gmail API (works on Render free tier) ---
+// Bypasses SMTP ports entirely by using the official Google REST API over HTTPS.
+const { google } = require("googleapis");
 
 const sendResetEmail = async (toEmail, userName, resetUrl) => {
-  const resend = new Resend(process.env.RESEND_API_KEY);
+  // Requires: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN, EMAIL_USER
+  const oAuth2Client = new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    "https://developers.google.com/oauthplayground"
+  );
 
-  const { data, error } = await resend.emails.send({
-    from: process.env.RESEND_FROM_EMAIL || "Bloom Skin <onboarding@resend.dev>",
-    to: [toEmail],
-    subject: "Reset Your Bloom Skin Password",
-    html: `
+  oAuth2Client.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN });
+
+  const gmail = google.gmail({ version: "v1", auth: oAuth2Client });
+
+  const subject = "Reset Your Bloom Skin Password";
+  const utf8Subject = `=?utf-8?B?${Buffer.from(subject).toString("base64")}?=`;
+  
+  const messageParts = [
+    `From: Bloom Skin <${process.env.EMAIL_USER}>`,
+    `To: ${toEmail}`,
+    `Subject: ${utf8Subject}`,
+    "Content-Type: text/html; charset=utf-8",
+    "MIME-Version: 1.0",
+    "",
+    `
       <div style="font-family: 'Segoe UI', sans-serif; max-width: 520px; margin: 0 auto; padding: 32px; background: #fff5f7; border-radius: 16px;">
         <h2 style="color: #ec4899; margin-bottom: 8px;">Bloom Skin</h2>
         <p style="color: #374151; font-size: 15px;">Hi <strong>${userName || "there"}</strong>,</p>
@@ -33,14 +48,24 @@ const sendResetEmail = async (toEmail, userName, resetUrl) => {
         <hr style="border: none; border-top: 1px solid #fce7f3; margin: 24px 0;" />
         <p style="color: #9ca3af; font-size: 12px; text-align: center;">Bloom Skin &mdash; Your skin's best companion</p>
       </div>
-    `,
+    `
+  ];
+
+  const message = messageParts.join('\n');
+  const encodedMessage = Buffer.from(message)
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+
+  const res = await gmail.users.messages.send({
+    userId: "me",
+    requestBody: {
+      raw: encodedMessage,
+    },
   });
 
-  if (error) {
-    throw new Error(`Resend API error: ${error.message || JSON.stringify(error)}`);
-  }
-
-  return data;
+  return res.data;
 };
 
 // @desc    Send password reset link to user's email
@@ -54,8 +79,8 @@ exports.forgotPassword = async (req, res) => {
     }
 
     // Pre-flight: ensure email service is configured
-    if (!process.env.RESEND_API_KEY) {
-      console.error("Forgot password error: RESEND_API_KEY environment variable is not set.");
+    if (!process.env.GOOGLE_REFRESH_TOKEN) {
+      console.error("Forgot password error: GOOGLE_REFRESH_TOKEN environment variable is not set.");
       return res.status(500).json({ error: "Email service is not configured. Please contact support." });
     }
 
