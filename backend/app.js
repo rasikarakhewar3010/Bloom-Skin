@@ -117,13 +117,17 @@ app.get('/health/email-check', async (req, res) => {
     try {
       const { Resend } = require("resend");
       const resend = new Resend(process.env.RESEND_API_KEY);
-      // Just validate the API key by listing domains (lightweight call)
       const { data, error } = await resend.domains.list();
       if (error) {
-        result.resendStatus = "API_KEY_INVALID";
-        result.resendError = error.message || JSON.stringify(error);
+        // "restricted to only send emails" means the key IS valid, just send-only permissions
+        if (error.message && error.message.includes("restricted")) {
+          result.resendStatus = "CONNECTED (send-only key)";
+        } else {
+          result.resendStatus = "API_KEY_INVALID";
+          result.resendError = error.message || JSON.stringify(error);
+        }
       } else {
-        result.resendStatus = "CONNECTED";
+        result.resendStatus = "CONNECTED (full access)";
         result.domains = data?.data?.map(d => d.name) || [];
       }
     } catch (err) {
