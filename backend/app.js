@@ -105,39 +105,33 @@ app.get('/health', (req, res) => {
 // Temporary diagnostic endpoint — check email service configuration
 // REMOVE THIS AFTER DEBUGGING
 app.get('/health/email-check', async (req, res) => {
-  const nodemailer = require("nodemailer");
   const result = {
-    emailUserSet: !!process.env.EMAIL_USER,
-    emailPassSet: !!process.env.EMAIL_PASS,
-    emailUserValue: process.env.EMAIL_USER ? process.env.EMAIL_USER.substring(0, 5) + "***" : "NOT SET",
+    resendApiKeySet: !!process.env.RESEND_API_KEY,
+    resendFromEmail: process.env.RESEND_FROM_EMAIL || "NOT SET (will use default onboarding@resend.dev)",
     frontendUrl: process.env.FRONTEND_URL || "NOT SET",
     nodeEnv: process.env.NODE_ENV || "NOT SET",
   };
 
-  // Test SMTP connection if credentials exist
-  if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+  // Test Resend API connectivity
+  if (process.env.RESEND_API_KEY) {
     try {
-      const transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        port: 587,
-        secure: false,
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS,
-        },
-        connectionTimeout: 10000,
-        greetingTimeout: 10000,
-        socketTimeout: 10000,
-      });
-      await transporter.verify();
-      result.smtpStatus = "CONNECTED";
-      transporter.close();
+      const { Resend } = require("resend");
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      // Just validate the API key by listing domains (lightweight call)
+      const { data, error } = await resend.domains.list();
+      if (error) {
+        result.resendStatus = "API_KEY_INVALID";
+        result.resendError = error.message || JSON.stringify(error);
+      } else {
+        result.resendStatus = "CONNECTED";
+        result.domains = data?.data?.map(d => d.name) || [];
+      }
     } catch (err) {
-      result.smtpStatus = "FAILED";
-      result.smtpError = err.message;
+      result.resendStatus = "FAILED";
+      result.resendError = err.message;
     }
   } else {
-    result.smtpStatus = "SKIPPED — credentials missing";
+    result.resendStatus = "SKIPPED — RESEND_API_KEY not set";
   }
 
   res.json(result);
