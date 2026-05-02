@@ -79,7 +79,7 @@ const Steps = () => {
           </p>
           <div className="grid grid-cols-2 gap-4">
             <img
-              src="/images/step3[[1]].png"
+              src="/images/Dashobard.png"
               alt="history 1"
               className="h-20 w-full rounded-lg object-cover shadow-md md:h-44 lg:h-60"
             />
