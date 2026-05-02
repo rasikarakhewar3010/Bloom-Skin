@@ -73,3 +73,11 @@ export const getRoutine = async () => {
   const response = await api.get('/routine');
   return response.data;
 };
+
+/**
+ * Tracks a routine completion (AM or PM).
+ */
+export const trackRoutine = async (timeOfDay) => {
+  const response = await api.post('/routine/track', { timeOfDay });
+  return response.data;
+};

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { getRoutine } from '../api/apiService';
+import { getRoutine, trackRoutine } from '../api/apiService';
 import { useNavigate } from 'react-router-dom';
 import { NavbarDemo } from '../NavbarDemo';
 import { useAuth } from '../context/AuthContext';
@@ -154,6 +154,26 @@ const RoutinePage = () => {
 
   useEffect(() => { fetchRoutine(); }, [fetchRoutine]);
 
+  const handleTrackRoutine = async () => {
+    try {
+      const res = await trackRoutine(timeOfDay === 'morning' ? 'am' : 'pm');
+      if (res?.routineTracking) {
+        setUser({ ...user, routineTracking: res.routineTracking });
+      }
+    } catch (err) {
+      console.error("Tracking error:", err);
+    }
+  };
+
+  const isCompletedToday = (() => {
+    if (!user?.routineTracking) return false;
+    const lastDate = timeOfDay === 'morning' 
+      ? user.routineTracking.lastAmCompletion 
+      : user.routineTracking.lastPmCompletion;
+    if (!lastDate) return false;
+    return new Date(lastDate).toDateString() === new Date().toDateString();
+  })();
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-white">
@@ -236,7 +256,7 @@ const RoutinePage = () => {
               <p className="text-sm text-gray-700 font-medium leading-relaxed">
                 Detected <span className="font-black text-gray-900">{basedOn.latestScan.prediction}</span> with{' '}
                 <span className="text-pink-500 font-black">{(basedOn.latestScan.confidence * 100).toFixed(0)}%</span> accuracy. 
-                Deep, painful nodules under the skin — severe inflammatory acne.
+                {basedOn.latestScan.description || ''}
               </p>
             </div>
           </div>
@@ -244,7 +264,7 @@ const RoutinePage = () => {
           <div className="bg-white border border-gray-100 rounded-[32px] p-8 flex items-center justify-center gap-4 shadow-sm text-center">
             <div className="w-12 h-12 bg-pink-50 rounded-2xl flex items-center justify-center text-2xl">📅</div>
             <div>
-              <p className="text-2xl font-black text-gray-900">3</p>
+              <p className="text-2xl font-black text-gray-900">{basedOn.totalScansAnalyzed}</p>
               <p className="text-[10px] font-black text-pink-400 uppercase tracking-widest">Recent Scans</p>
             </div>
           </div>
@@ -259,8 +279,8 @@ const RoutinePage = () => {
             <ConflictCenter conflicts={routine.conflicts} />
 
             {/* PREMIUM ANIMATED TOGGLE */}
-            <div className="flex justify-center mb-10">
-              <div className="bg-gray-100/80 backdrop-blur-md rounded-full p-1.5 flex relative w-full max-w-[320px] shadow-inner border border-gray-200/50">
+            <div className="flex flex-col items-center mb-10">
+              <div className="bg-gray-100/80 backdrop-blur-md rounded-full p-1.5 flex relative w-full max-w-[320px] shadow-inner border border-gray-200/50 mb-6">
                 {/* Sliding Background Pill */}
                 <motion.div
                   className={`absolute top-1.5 bottom-1.5 rounded-full shadow-lg z-0 ${
@@ -315,6 +335,29 @@ const RoutinePage = () => {
                   Night
                 </button>
               </div>
+
+              {/* Mark as Done Button */}
+              <motion.button
+                whileHover={!isCompletedToday ? { scale: 1.05, y: -2 } : {}}
+                whileTap={!isCompletedToday ? { scale: 0.95 } : {}}
+                onClick={handleTrackRoutine}
+                disabled={isCompletedToday}
+                className={`px-10 py-3.5 rounded-full font-black uppercase tracking-widest text-[11px] shadow-lg transition-all flex items-center gap-3 ${
+                  isCompletedToday 
+                    ? 'bg-emerald-50 text-emerald-600 border border-emerald-100 cursor-default' 
+                    : 'bg-white text-gray-900 border border-gray-100 hover:shadow-2xl hover:border-pink-200'
+                }`}
+              >
+                {isCompletedToday ? (
+                  <>
+                    <span className="text-base">✅</span> {timeOfDay.toUpperCase()} Completed Today
+                  </>
+                ) : (
+                  <>
+                    <span className="text-base">⭕</span> Mark {timeOfDay.toUpperCase()} as Done
+                  </>
+                )}
+              </motion.button>
             </div>
 
             {/* ROUTINE LIST */}
