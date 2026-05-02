@@ -1,7 +1,8 @@
 Flask
 Flask-Cors
-tensorflow
+tensorflow-cpu
 numpy
 Pillow
-opencv-python
+opencv-python-headless
 mtcnn
+gunicorn

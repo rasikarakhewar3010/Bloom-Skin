@@ -18,6 +18,8 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": [
     "http://localhost:3000",
     "http://localhost:5173",
+    "https://bloom-skin-backend.onrender.com",
+    os.environ.get("ALLOWED_ORIGIN", ""),
 ]}})
 
 # Configure logging instead of print statements
@@ -63,29 +65,27 @@ def analyze_skin_image(image_bytes):
         img_rgb = np.array(img)
     except Exception:
         return {
-            'class': 'Invalid Image',
-            'confidence': 1.0,
-            'info': TREATMENT_INFO['Invalid Image']['info']
+            'error': 'Invalid Image. We could not process the image.'
         }, 400
 
-    detections = face_detector.detect_faces(img_rgb)
     image_to_process = img_rgb
 
-    if detections:
-        logger.info("Face detected. Cropping region of interest.")
-        x, y, width, height = detections[0]['box']
-        # Pad the bounding box by 25% to ensure cheeks and forehead are included
-        pad_w, pad_h = int(width * 0.25), int(height * 0.25)
-        x1, y1 = max(0, x - pad_w), max(0, y - pad_h)
-        x2, y2 = min(img_rgb.shape[1], x + width + pad_w), min(img_rgb.shape[0], y + height + pad_h)
-        image_to_process = img_rgb[y1:y2, x1:x2]
-    else:
-        logger.info("No face detected.")
-        return {
-            'class': 'No Face Detected',
-            'confidence': 1.0,
-            'info': 'We could not detect a clear face. Please retake the photo facing a window for natural light.'
-        }, 400
+    # Try face detection, but fall back to full image if no face found.
+    # This allows close-up skin photos to still be analyzed.
+    try:
+        detections = face_detector.detect_faces(img_rgb)
+        if detections:
+            logger.info("Face detected. Cropping region of interest.")
+            x, y, width, height = detections[0]['box']
+            # Pad the bounding box by 25% to ensure cheeks and forehead are included
+            pad_w, pad_h = int(width * 0.25), int(height * 0.25)
+            x1, y1 = max(0, x - pad_w), max(0, y - pad_h)
+            x2, y2 = min(img_rgb.shape[1], x + width + pad_w), min(img_rgb.shape[0], y + height + pad_h)
+            image_to_process = img_rgb[y1:y2, x1:x2]
+        else:
+            logger.info("No face detected. Analyzing full image as-is.")
+    except Exception as e:
+        logger.warning(f"Face detection failed ({e}). Analyzing full image as-is.")
 
     try:
         resized_image = cv2.resize(image_to_process, (224, 224))
