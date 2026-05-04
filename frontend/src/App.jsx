@@ -1,8 +1,7 @@
-import { useState, useEffect, lazy, Suspense } from 'react';
+import { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 
 import './App.css';
-import BloomLoader from './HomePage/BloomLoader';
 
 // --- Lazy Load Pages for Performance ---
 const HomePage = lazy(() => import('./HomePage/HomePage'));
@@ -34,27 +33,6 @@ const PageFallback = () => (
 
 function AppWrapper() {
   const location = useLocation();
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const loaderAlreadyShown = sessionStorage.getItem('loaderShown');
-
-    // Reduced from 2500ms to 1800ms for a snappier feel while maintaining premium aesthetic
-    if (location.pathname === '/' && !loaderAlreadyShown) {
-      const timer = setTimeout(() => {
-        setLoading(false);
-        sessionStorage.setItem('loaderShown', 'true');
-      }, 1800);
-
-      return () => clearTimeout(timer);
-    } else {
-      setLoading(false);
-    }
-  }, [location.pathname]);
-
-  if (loading && location.pathname === '/') {
-    return <BloomLoader onComplete={() => setLoading(false)} />;
-  }
 
   return (
     <AuthProvider>
