@@ -252,11 +252,21 @@ const RoutinePage = () => {
               ))}
             </div>
             <div className="flex-1 text-center md:text-left">
-              <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest mb-1">Latest Scan Intelligence</p>
+              <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest mb-1">
+                {basedOn.latestScan ? 'Latest Scan Intelligence' : 'General Intelligence'}
+              </p>
               <p className="text-sm text-gray-700 font-medium leading-relaxed">
-                Detected <span className="font-black text-gray-900">{basedOn.latestScan.prediction}</span> with{' '}
-                <span className="text-pink-500 font-black">{(basedOn.latestScan.confidence * 100).toFixed(0)}%</span> accuracy. 
-                {basedOn.latestScan.description || ''}
+                {basedOn.latestScan ? (
+                  <>
+                    Detected <span className="font-black text-gray-900">{basedOn.latestScan.prediction}</span> with{' '}
+                    <span className="text-pink-500 font-black">{(basedOn.latestScan.confidence * 100).toFixed(0)}%</span> accuracy.{' '}
+                    {basedOn.latestScan.description || ''}
+                  </>
+                ) : (
+                  <>
+                    {basedOn.message}
+                  </>
+                )}
               </p>
             </div>
           </div>
