@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { FaSpa, FaPaperPlane, FaTimes } from 'react-icons/fa';
+import { Flower2, Send, X } from 'lucide-react';
 
 // --- Constants: Your original pink theme is preserved ---
 const THEME_COLORS = {
@@ -131,7 +131,7 @@ const ChatHeader = ({ onClose }) => (
     <div className="flex justify-between items-center">
       <div className="flex items-center space-x-3">
         <div className="p-2 bg-white/20 rounded-full">
-          <FaSpa className="text-xl" />
+          <Flower2 className="text-xl" />
         </div>
         <div>
           <h2 className="text-lg font-bold">BloomBot</h2>
@@ -139,7 +139,7 @@ const ChatHeader = ({ onClose }) => (
         </div>
       </div>
       <button onClick={onClose} className="p-1 rounded-full hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white" aria-label="Close chat">
-        <FaTimes />
+        <X />
       </button>
     </div>
   </div>
@@ -226,7 +226,7 @@ const ChatInput = ({ value, onChange, onSend, disabled }) => (
         disabled={!value.trim() || disabled}
         aria-label="Send message"
       >
-        <FaPaperPlane />
+        <Send />
       </button>
     </div>
   </div>
@@ -310,7 +310,7 @@ const ChatBot = () => {
           aria-label="Open BloomSkin chatbot"
           style={{ animationDuration: '2s', animationIterationCount: 'infinite' }}
         >
-          <FaSpa className="text-2xl" />
+          <Flower2 className="text-2xl" />
           <span className={`absolute top-0 right-0 w-4 h-4 bg-[${THEME_COLORS.secondary}] rounded-full border-2 border-white`}></span>
         </button>
       )}

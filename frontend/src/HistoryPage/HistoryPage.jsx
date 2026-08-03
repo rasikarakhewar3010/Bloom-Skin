@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { getHistory, deleteHistory, exportHistory } from '../api/apiService';
 import { useNavigate } from 'react-router-dom';
 import './HistoryPage.css'; // Keep this for the fade-in animation
-import { FaTrashAlt, FaEnvelopeOpenText } from 'react-icons/fa';
+import { Trash2, MailOpen } from 'lucide-react';
 
 // --- No changes needed for this component ---
 const LoadingSpinner = () => (
@@ -110,7 +110,7 @@ const HistoryPage = () => {
             disabled={history.length === 0 || loading}
             className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 sm:py-2 bg-pink-500 hover:bg-pink-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all disabled:bg-gray-300 disabled:shadow-none disabled:transform-none disabled:cursor-not-allowed"
           >
-            <FaEnvelopeOpenText className="text-lg" />
+            <MailOpen className="text-lg" />
             <span>Export to Email</span>
           </button>
           <button
@@ -118,7 +118,7 @@ const HistoryPage = () => {
             disabled={history.length === 0 || loading}
             className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 sm:py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-full transition-colors disabled:bg-gray-300/70 disabled:text-gray-500 disabled:cursor-not-allowed"
           >
-            <FaTrashAlt className="text-md" />
+            <Trash2 className="text-md" />
             <span>Clear All History</span>
           </button>
         </div>

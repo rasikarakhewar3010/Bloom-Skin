@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiInstagram, FiTwitter, FiGithub, FiMail } from 'react-icons/fi';
+import { Instagram, Twitter, Github } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const BloomSkinFooter = () => {
@@ -25,13 +25,13 @@ const BloomSkinFooter = () => {
             </p>
             <div className="flex space-x-5 pt-2">
               <a href="#" aria-label="Twitter" className="text-gray-400 hover:text-pink-500 transition-colors bg-gray-50 hover:bg-pink-50 p-2.5 rounded-full">
-                <FiTwitter className="h-5 w-5" />
+                <Twitter className="h-5 w-5" />
               </a>
               <a href="#" aria-label="Instagram" className="text-gray-400 hover:text-pink-500 transition-colors bg-gray-50 hover:bg-pink-50 p-2.5 rounded-full">
-                <FiInstagram className="h-5 w-5" />
+                <Instagram className="h-5 w-5" />
               </a>
               <a href="https://github.com/rasikarakhewar3010" aria-label="GitHub" className="text-gray-400 hover:text-pink-500 transition-colors bg-gray-50 hover:bg-pink-50 p-2.5 rounded-full">
-                <FiGithub className="h-5 w-5" />
+                <Github className="h-5 w-5" />
               </a>
             </div>
           </div>
