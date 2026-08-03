@@ -4,6 +4,8 @@
   <p><strong>The Future of AI-Powered Dermatology</strong></p>
   <p><i>Transforming any smartphone into a clinical-grade skin diagnostic tool.</i></p>
 
+
+
   <div>
     <img src="https://img.shields.io/badge/Production-Live-success?style=for-the-badge&logo=vercel" alt="Production">
     <img src="https://img.shields.io/badge/Frontend-React_19-61DAFB?style=for-the-badge&logo=react" alt="React">
