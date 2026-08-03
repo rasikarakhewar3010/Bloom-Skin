@@ -40,4 +40,4 @@ ENV MALLOC_ARENA_MAX=2
 EXPOSE 5000
 
 # Use gunicorn for production (1 worker, 120s timeout for model loading)
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "1", "--timeout", "120", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "1", "--worker-class", "gevent", "--timeout", "120", "app:app"]
