@@ -10,6 +10,7 @@ const LoginSignup = () => {
   const [flash, setFlash] = useState({ message: "", type: "" });
   const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
   const navigate = useNavigate();
   const { isLoggedIn, setIsLoggedIn, setUser, checkAuth } = useAuth();
 
@@ -35,11 +36,19 @@ const LoginSignup = () => {
     e.preventDefault();
     if (submitting) return;
 
-    // Client-side validation
-    if (!form.email || !form.password || (!isLogin && !form.name)) {
-      showFlash("Please fill in all required fields.", "error");
+    // Client-side validation with inline errors
+    const errors = {};
+    if (!isLogin && !form.name?.trim()) errors.name = 'Name is required';
+    if (!form.email?.trim()) errors.email = 'Email is required';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errors.email = 'Please enter a valid email';
+    if (!form.password) errors.password = 'Password is required';
+    else if (!isLogin && form.password.length < 6) errors.password = 'Password must be at least 6 characters';
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
       return;
     }
+    setFieldErrors({});
 
     const baseUrl = import.meta.env.VITE_API_URL || "";
     setSubmitting(true);
@@ -102,8 +111,14 @@ const LoginSignup = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-pink-50 p-4 relative">
       <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md transition-all duration-300">
+        {/* Back to Home link */}
+        <Link to="/" className="flex items-center justify-center gap-2 mb-6 group">
+          <span className="text-2xl">🌸</span>
+          <span className="text-xl font-bold text-pink-500 group-hover:text-pink-600 transition">BloomSkin</span>
+        </Link>
+
         <h2 className="text-3xl font-bold mb-6 text-center text-pink-500">
-          {isLogin ? "Login" : "Sign Up"}
+          {isLogin ? "Welcome Back" : "Create Account"}
         </h2>
 
         {flash.message && (
@@ -120,42 +135,63 @@ const LoginSignup = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
-            <input
-              type="text"
-              name="name"
-              placeholder="Name"
-              value={form.name || ""}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-400"
-              required
-            />
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+              <input
+                id="name"
+                type="text"
+                name="name"
+                placeholder="Enter your full name"
+                value={form.name || ""}
+                onChange={handleChange}
+                className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-400 ${
+                  fieldErrors.name ? 'border-red-400 bg-red-50' : 'border-gray-300'
+                }`}
+                required
+              />
+              {fieldErrors.name && <p className="text-xs text-red-500 mt-1">{fieldErrors.name}</p>}
+            </div>
           )}
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={form.email || ""}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-400"
-            required
-          />
-          <div className="relative">
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
             <input
-              type={showPassword ? "text" : "password"}
-              name="password"
-              placeholder="Password"
-              value={form.password || ""}
+              id="email"
+              type="email"
+              name="email"
+              placeholder="you@example.com"
+              value={form.email || ""}
               onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-400 pr-10"
+              className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-400 ${
+                fieldErrors.email ? 'border-red-400 bg-red-50' : 'border-gray-300'
+              }`}
               required
             />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer"
-            >
-              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-            </button>
+            {fieldErrors.email && <p className="text-xs text-red-500 mt-1">{fieldErrors.email}</p>}
+          </div>
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <div className="relative">
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="Enter your password"
+                value={form.password || ""}
+                onChange={handleChange}
+                className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-400 pr-10 ${
+                  fieldErrors.password ? 'border-red-400 bg-red-50' : 'border-gray-300'
+                }`}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
+            {fieldErrors.password && <p className="text-xs text-red-500 mt-1">{fieldErrors.password}</p>}
           </div>
           {isLogin && (
             <div className="text-right">

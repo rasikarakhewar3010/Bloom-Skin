@@ -126,17 +126,23 @@ const OnboardingFlow = ({ onComplete }) => {
             </div>
           )}
 
-          <div className="flex justify-between mt-10 pt-4 border-t border-gray-100">
-            {step > 1 ? (
-              <button
-                onClick={handleBack}
-                className="px-6 py-2 rounded-full font-bold text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer"
-              >
-                Back
-              </button>
-            ) : (
-              <div /> // Placeholder for alignment
-            )}
+          <div className="flex justify-between items-center mt-10 pt-4 border-t border-gray-100">
+            <div className="flex items-center gap-2">
+              {step > 1 ? (
+                <button
+                  onClick={handleBack}
+                  className="px-6 py-2 rounded-full font-bold text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer"
+                >
+                  Back
+                </button>
+              ) : (
+                <button
+                  onClick={onComplete}
+                  className="text-sm text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+                >
+                  Skip for now
+                </button>
+              )}
             
             {step < 3 ? (
               <button
@@ -155,6 +161,7 @@ const OnboardingFlow = ({ onComplete }) => {
                 {loading ? 'Saving...' : 'Finish Setup'}
               </button>
             )}
+            </div>
           </div>
         </div>
       </div>

@@ -232,7 +232,7 @@ const ScanCard = ({ scan }) => {
         <img src={scan.imageUrl} alt="scan" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
         <div className="absolute top-2 right-2 px-1.5 py-0.5 bg-white bg-opacity-90 backdrop-blur-sm rounded-lg shadow-sm">
           <span className="text-[9px] font-black text-teal-500 flex items-center gap-0.5">
-             <TrendingUp className="w-2.5 h-2.5" /> +3%
+             <TrendingUp className="w-2.5 h-2.5" /> {scan.prediction !== 'Clear Skin' ? 'Detected' : 'Clear'}
           </span>
         </div>
       </div>
@@ -304,9 +304,23 @@ const DashboardPage = () => {
 
   const improvementSparkData = useMemo(() => {
     if (!stats?.severityTrend) return [0, 0];
-    // Show improvement as inverted severity/confidence
     return stats.severityTrend.map(s => 1 - s.confidence);
   }, [stats]);
+
+  const improvementPercent = useMemo(() => {
+    if (!stats?.severityTrend || stats.severityTrend.length < 2) return null;
+    const first = stats.severityTrend[0].confidence;
+    const last = stats.severityTrend[stats.severityTrend.length - 1].confidence;
+    const diff = ((last - first) * 100).toFixed(0);
+    return diff >= 0 ? `+${diff}%` : `${diff}%`;
+  }, [stats]);
+
+  const greeting = useMemo(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
+  }, []);
 
   if (loading) return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center">
@@ -336,7 +350,7 @@ const DashboardPage = () => {
                
                <div className="flex-1 text-center md:text-left z-10">
                   <h1 className="text-3xl lg:text-4xl font-black text-gray-900 leading-tight tracking-tight">
-                    Good evening, <span className="text-pink-500">{user?.name?.split(' ')[0] || 'Demo'}!</span> 👋
+                    {greeting}, <span className="text-pink-500">{user?.name?.split(' ')[0] || 'there'}!</span> 👋
                   </h1>
                   <p className="text-gray-400 font-bold text-xs mt-3 leading-relaxed max-w-[240px]">
                     Your skin is improving beautifully. Keep following your routine!
@@ -365,8 +379,8 @@ const DashboardPage = () => {
                <MetricCard 
                   icon={TrendingUp} 
                   title="Improvement" 
-                  value="+18%" 
-                  trend="+18%" 
+                  value={improvementPercent || 'N/A'} 
+                  trend={improvementPercent} 
                   sparkData={improvementSparkData} 
                   color="teal"
                />

@@ -28,6 +28,7 @@ const HistoryPage = () => {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const fetchHistory = useCallback(async () => {
     try {
@@ -49,19 +50,16 @@ const HistoryPage = () => {
   }, [fetchHistory]);
 
   const handleClearHistory = async () => {
-    // A more user-friendly confirmation dialog
-    if (window.confirm('Are you absolutely sure you want to delete your entire analysis history? This action cannot be undone.')) {
-      try {
-        setLoading(true); // Provide visual feedback during deletion
-        const res = await deleteHistory();
-        setMessage(res.msg || 'History cleared successfully!');
-        setHistory([]);
-      } catch (error) {
-        setMessage('Failed to clear history. Please try again.');
-
-      } finally {
-        setLoading(false);
-      }
+    try {
+      setLoading(true);
+      const res = await deleteHistory();
+      setMessage(res.msg || 'History cleared successfully!');
+      setHistory([]);
+      setShowDeleteModal(false);
+    } catch (error) {
+      setMessage('Failed to clear history. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -114,7 +112,7 @@ const HistoryPage = () => {
             <span>Export to Email</span>
           </button>
           <button
-            onClick={handleClearHistory}
+            onClick={() => setShowDeleteModal(true)}
             disabled={history.length === 0 || loading}
             className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 sm:py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-full transition-colors disabled:bg-gray-300/70 disabled:text-gray-500 disabled:cursor-not-allowed"
           >
@@ -175,6 +173,36 @@ const HistoryPage = () => {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-red-100 mb-5">
+              <Trash2 className="h-7 w-7 text-red-600" />
+            </div>
+            <h3 className="text-xl font-bold text-center text-gray-900 mb-2">Clear All History?</h3>
+            <p className="text-center text-gray-500 mb-8 text-sm">
+              Are you absolutely sure you want to delete your entire analysis history? This action cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button 
+                onClick={() => setShowDeleteModal(false)} 
+                className="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold rounded-xl transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleClearHistory} 
+                disabled={loading} 
+                className="flex-1 px-4 py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl transition-colors cursor-pointer disabled:opacity-50"
+              >
+                {loading ? 'Deleting...' : 'Delete All'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

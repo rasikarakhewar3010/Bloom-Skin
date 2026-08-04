@@ -65,7 +65,7 @@ export function NavbarDemo() {
   ];
 
   return (
-    <div className="relative w-full pt-8 z-60">
+    <div className="relative w-full pt-2 lg:pt-8 z-60">
       {flash && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-yellow-100 border border-yellow-300 text-yellow-800 px-4 py-2 rounded-full shadow-md z-[100] transition-all duration-300 font-medium text-sm">
           {flash}

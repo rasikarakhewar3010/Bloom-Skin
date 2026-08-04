@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getPrediction } from '../api/apiService';
+import * as tf from '@tensorflow/tfjs';
+import * as blazeface from '@tensorflow-models/blazeface';
 
 // --- Acne Info Data (Enhanced for Demo & Production) ---
 const acneInfo = {
@@ -54,11 +56,14 @@ export default function ImageUpload() {
   
   // --- NEW: State for the camera warning modal ---
   const [showCameraWarning, setShowCameraWarning] = useState(false);
+  const [faceStatus, setFaceStatus] = useState({ message: 'Initializing camera...', color: 'gray', aligned: false });
 
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const fileInputRef = useRef(null);
   const containerRef = useRef(null);
+  const faceDetectionIntervalRef = useRef(null);
+  const faceModelRef = useRef(null);
 
   const stopCamera = useCallback(() => {
     if (streamRef.current) {
@@ -69,7 +74,76 @@ export default function ImageUpload() {
       videoRef.current.srcObject = null;
     }
     setCameraActive(false);
+    if (faceDetectionIntervalRef.current) {
+      clearInterval(faceDetectionIntervalRef.current);
+    }
+    setFaceStatus({ message: 'Initializing camera...', color: 'gray', aligned: false });
   }, []);
+
+  const loadFaceModel = async () => {
+    if (!faceModelRef.current) {
+      try {
+        await tf.ready();
+        faceModelRef.current = await blazeface.load();
+      } catch (err) {
+        console.error("Failed to load BlazeFace model:", err);
+      }
+    }
+  };
+
+  const startFaceDetection = async () => {
+    await loadFaceModel();
+    if (faceDetectionIntervalRef.current) clearInterval(faceDetectionIntervalRef.current);
+    
+    faceDetectionIntervalRef.current = setInterval(async () => {
+      if (videoRef.current && faceModelRef.current) {
+        const video = videoRef.current;
+        if (video.readyState === 4) {
+          try {
+            const predictions = await faceModelRef.current.estimateFaces(video, false);
+            
+            if (predictions.length === 0) {
+              setFaceStatus({ message: 'No face detected. Please step into view.', color: 'red', aligned: false });
+            } else if (predictions.length > 1) {
+              setFaceStatus({ message: 'Multiple faces detected. Please ensure only you are in frame.', color: 'red', aligned: false });
+            } else {
+              const face = predictions[0];
+              const [x1, y1] = face.topLeft;
+              const [x2, y2] = face.bottomRight;
+              
+              const faceWidth = x2 - x1;
+              const faceHeight = y2 - y1;
+              const videoWidth = video.videoWidth;
+              const videoHeight = video.videoHeight;
+              
+              const faceCenterX = x1 + (faceWidth / 2);
+              const faceCenterY = y1 + (faceHeight / 2);
+              const videoCenterX = videoWidth / 2;
+              const videoCenterY = videoHeight / 2;
+
+              const distanceX = Math.abs(faceCenterX - videoCenterX);
+              const distanceY = Math.abs(faceCenterY - videoCenterY);
+              const isCentered = distanceX < videoWidth * 0.15 && distanceY < videoHeight * 0.15;
+              
+              const faceAreaRatio = (faceWidth * faceHeight) / (videoWidth * videoHeight);
+              const isRightSize = faceAreaRatio > 0.05 && faceAreaRatio < 0.4;
+              
+              if (!isRightSize) {
+                 if (faceAreaRatio <= 0.05) setFaceStatus({ message: 'Move closer to the camera', color: 'amber', aligned: false });
+                 else setFaceStatus({ message: 'Move further away', color: 'amber', aligned: false });
+              } else if (!isCentered) {
+                 setFaceStatus({ message: 'Center your face in the oval', color: 'amber', aligned: false });
+              } else {
+                 setFaceStatus({ message: 'Perfect! Ready to capture.', color: 'green', aligned: true });
+              }
+            }
+          } catch (err) {
+            console.error("Face detection error:", err);
+          }
+        }
+      }
+    }, 200);
+  };
 
   useEffect(() => {
     return () => stopCamera();
@@ -150,8 +224,20 @@ export default function ImageUpload() {
       }
 
     } catch (err) {
-
-      setError(err.message || 'Analysis failed. Please try again.');
+      // Friendly error messages based on error type
+      if (err.response?.status === 503 || err.message?.includes('503')) {
+        setError('Our AI is waking up! This takes about 30-60 seconds on the first scan. Please try again in a moment. ☕');
+      } else if (err.response?.status === 413) {
+        setError('Image is too large. Please use an image under 5MB.');
+      } else if (err.response?.status === 415) {
+        setError('Unsupported image format. Please use JPEG, PNG, or WebP.');
+      } else if (err.response?.status === 401) {
+        setError('Your session has expired. Please log in again.');
+      } else if (err.code === 'ERR_NETWORK' || err.message?.includes('Network Error')) {
+        setError('Unable to connect to the server. Please check your internet connection and try again.');
+      } else {
+        setError(err.response?.data?.error || err.message || 'Analysis failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -389,7 +475,7 @@ export default function ImageUpload() {
                               playsInline
                               muted
                               className="w-full h-full object-cover"
-                              onCanPlay={() => setCameraActive(true)}
+                              onCanPlay={() => { setCameraActive(true); startFaceDetection(); }}
                             />
                             {!cameraActive && (
                               <div className="absolute inset-0 flex items-center justify-center bg-black/60">
@@ -401,15 +487,20 @@ export default function ImageUpload() {
                             )}
                             {cameraActive && (
                               <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center">
-                                {/* Face Guide Oval */}
-                                <div className="w-48 h-64 border-2 border-dashed border-white/70 rounded-[100px] mb-4 relative">
-                                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-black/50 text-white text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap">
-                                    Align Face Here
+                                {/* Smart Face Guide Oval */}
+                                <div className={`w-48 h-64 border-4 rounded-[100px] mb-4 relative transition-colors duration-300 ${
+                                  faceStatus.color === 'green' ? 'border-green-500 bg-green-500/10' :
+                                  faceStatus.color === 'amber' ? 'border-amber-400 border-dashed' :
+                                  'border-red-500 border-dashed'
+                                }`}>
+                                  <div className={`absolute -top-3 left-1/2 -translate-x-1/2 text-white text-[11px] px-4 py-1 rounded-full whitespace-nowrap font-bold shadow-lg ${
+                                    faceStatus.color === 'green' ? 'bg-green-500' :
+                                    faceStatus.color === 'amber' ? 'bg-amber-500' :
+                                    'bg-red-500'
+                                  }`}>
+                                    {faceStatus.color === 'green' ? '✓ ' : ''}{faceStatus.message}
                                   </div>
                                 </div>
-                                <p className="text-white/90 text-xs font-medium bg-black/40 px-3 py-1 rounded-full">
-                                  Tip: Stand facing a window for natural light.
-                                </p>
                               </div>
                             )}
                           </>
@@ -421,7 +512,12 @@ export default function ImageUpload() {
                           <button
                             aria-label="Capture Photo"
                             onClick={capturePhoto}
-                            className="flex-1 bg-pink-600 hover:bg-pink-700 text-white py-3 rounded-lg font-medium transition duration-200 flex items-center justify-center space-x-2 shadow-md"
+                            disabled={!faceStatus.aligned}
+                            className={`flex-1 py-3 rounded-lg font-bold transition duration-200 flex items-center justify-center space-x-2 shadow-md ${
+                              faceStatus.aligned 
+                                ? 'bg-green-500 hover:bg-green-600 text-white' 
+                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            }`}
                           >
                             <CameraIcon className="h-5 w-5" />
                             <span>Capture Photo</span>
@@ -462,6 +558,21 @@ export default function ImageUpload() {
                   </>
                 )}
               </button>
+              {loading && (
+                <div className="mt-3 bg-gray-50 rounded-xl p-4 border border-gray-100">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Spinner className="h-4 w-4 text-pink-500" />
+                    <span className="text-sm font-medium text-gray-600">Processing your image...</span>
+                  </div>
+                  <div className="space-y-1.5 ml-7">
+                    <p className="text-xs text-green-600 font-medium">✅ Image uploaded</p>
+                    <p className="text-xs text-green-600 font-medium">✅ Detecting skin area</p>
+                    <p className="text-xs text-pink-500 font-medium animate-pulse">⏳ Running AI analysis...</p>
+                    <p className="text-xs text-gray-400">⬜ Generating results</p>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-2 ml-7">Usually takes 5-15 seconds</p>
+                </div>
+              )}
 
             </div>
           </div>
@@ -480,13 +591,35 @@ export default function ImageUpload() {
                         {result.class}
                       </h3>
                       {result.confidence != null && (
-                        <p className="text-sm font-medium text-gray-500">
-                          {(result.confidence * 100).toFixed(1)}% confidence
-                        </p>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                              <div
+                                className={`h-full rounded-full transition-all duration-700 ${
+                                  result.confidence >= 0.8 ? 'bg-green-500' :
+                                  result.confidence >= 0.6 ? 'bg-amber-500' : 'bg-red-400'
+                                }`}
+                                style={{ width: `${(result.confidence * 100).toFixed(0)}%` }}
+                              />
+                            </div>
+                            <p className="text-sm font-medium text-gray-500 whitespace-nowrap">
+                              {(result.confidence * 100).toFixed(1)}%
+                            </p>
+                          </div>
+                        </div>
                       )}
                     </div>
                   </div>
                   <div className="mt-6 space-y-5 flex-grow overflow-y-auto pr-2 custom-scrollbar">
+                    {result.confidence != null && result.confidence < 0.70 && (
+                      <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-start gap-2">
+                        <span className="text-amber-500 mt-0.5">⚠️</span>
+                        <div>
+                          <p className="text-sm font-semibold text-amber-700">Low Confidence Result</p>
+                          <p className="text-xs text-amber-600 mt-0.5">For better accuracy, retake the photo with good lighting and a closer view of the affected area.</p>
+                        </div>
+                      </div>
+                    )}
                     <div className="bg-pink-50/70 rounded-xl p-4 border border-pink-100">
                       <h4 className="font-semibold text-base text-pink-700 flex items-center gap-2 mb-1.5">
                         <InfoIcon className="h-5 w-5 text-pink-500" />
@@ -519,13 +652,26 @@ export default function ImageUpload() {
                 </div>
               ) : (
                 <div className="h-full flex items-center justify-center p-6 sm:p-8">
-                  <div className="text-center max-w-xs mx-auto">
-                    <div className="mx-auto h-16 w-16 text-gray-300 mb-4">
-                      <BulbIcon />
+                  {loading ? (
+                    <div className="text-center max-w-xs mx-auto">
+                      <div className="mx-auto h-16 w-16 text-pink-400 mb-4 animate-pulse">
+                        <CheckShieldIcon className="h-16 w-16" />
+                      </div>
+                      <h3 className="text-xl font-semibold text-pink-500 mb-1">Analyzing Your Skin</h3>
+                      <p className="text-sm text-gray-400">Our AI is examining your photo for skin conditions...</p>
+                      <div className="mt-4 w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                        <div className="bg-gradient-to-r from-pink-500 to-purple-500 h-full rounded-full animate-pulse" style={{width: '65%'}} />
+                      </div>
                     </div>
-                    <h3 className="text-xl font-semibold text-gray-500 mb-1">Awaiting Analysis</h3>
-                    <p className="text-sm text-gray-400">Results will appear here after you analyze an image.</p>
-                  </div>
+                  ) : (
+                    <div className="text-center max-w-xs mx-auto">
+                      <div className="mx-auto h-16 w-16 text-gray-300 mb-4">
+                        <BulbIcon />
+                      </div>
+                      <h3 className="text-xl font-semibold text-gray-500 mb-1">Awaiting Analysis</h3>
+                      <p className="text-sm text-gray-400">Results will appear here after you analyze an image.</p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

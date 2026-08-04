@@ -24,10 +24,10 @@ const BloomSkinFooter = () => {
               Your personalized AI dermatologist. We combine advanced machine learning with dermatological insights to help you achieve your healthiest skin yet.
             </p>
             <div className="flex space-x-5 pt-2">
-              <a href="#" aria-label="Twitter" className="text-gray-400 hover:text-pink-500 transition-colors bg-gray-50 hover:bg-pink-50 p-2.5 rounded-full">
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="text-gray-400 hover:text-pink-500 transition-colors bg-gray-50 hover:bg-pink-50 p-2.5 rounded-full">
                 <Twitter className="h-5 w-5" />
               </a>
-              <a href="#" aria-label="Instagram" className="text-gray-400 hover:text-pink-500 transition-colors bg-gray-50 hover:bg-pink-50 p-2.5 rounded-full">
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-gray-400 hover:text-pink-500 transition-colors bg-gray-50 hover:bg-pink-50 p-2.5 rounded-full">
                 <Instagram className="h-5 w-5" />
               </a>
               <a href="https://github.com/rasikarakhewar3010" aria-label="GitHub" className="text-gray-400 hover:text-pink-500 transition-colors bg-gray-50 hover:bg-pink-50 p-2.5 rounded-full">
@@ -60,10 +60,10 @@ const BloomSkinFooter = () => {
                 <Link to="/contact" className="text-gray-500 hover:text-pink-600 font-medium transition-colors">Contact Us</Link>
               </li>
               <li>
-                <a href="#" className="text-gray-500 hover:text-pink-600 font-medium transition-colors">Privacy Policy</a>
+                <Link to="/" className="text-gray-500 hover:text-pink-600 font-medium transition-colors">Privacy Policy</Link>
               </li>
               <li>
-                <a href="#" className="text-gray-500 hover:text-pink-600 font-medium transition-colors">Terms of Service</a>
+                <Link to="/" className="text-gray-500 hover:text-pink-600 font-medium transition-colors">Terms of Service</Link>
               </li>
             </ul>
           </div>

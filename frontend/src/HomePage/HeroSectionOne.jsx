@@ -68,7 +68,7 @@ export function HeroSectionOne() {
             - 'max-w-*' classes are now responsive to give the text more room on larger screens.
         */}
         <p className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl mx-auto text-base sm:text-lg md:text-xl text-neutral-700 dark:text-neutral-400">
-          UStop the guesswork. Understand your skin's true needs and unlock the confidence to build a routine that works for you.
+          Stop the guesswork. Understand your skin's true needs and unlock the confidence to build a routine that works for you.
         </p>
 
         {/* BUTTON:
