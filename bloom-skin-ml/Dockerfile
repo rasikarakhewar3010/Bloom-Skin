@@ -4,10 +4,8 @@ FROM python:3.10-slim
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies for OpenCV and curl for model download
+# Install system dependencies (curl is needed to download the model)
 RUN apt-get update && apt-get install -y \
-    libgl1-mesa-glx \
-    libglib2.0-0 \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
@@ -28,7 +26,7 @@ COPY . .
 # Download the model file from Hugging Face (FREE hosting)
 RUN mkdir -p model && \
     curl -L -o model/skin_problem_classifier_v1.h5 \
-    "https://huggingface.co/Rasik3010/bloomskin-model/resolve/main/skin_problem_classifier_v1.h5"
+    "https://huggingface.co/rasikarakhewar3010/bloomskin-model/resolve/main/skin_problem_classifier_v1.h5"
 
 # Set environment variables
 ENV PORT=5000
