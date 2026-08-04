@@ -71,7 +71,8 @@ router.get("/me", (req, res) => {
 // @desc    Update user profile
 // @access  Private
 const { updateProfile } = require("../controllers/authController");
-router.put("/profile", updateProfile);
+const authMiddleware = require("../middleware/auth.middleware");
+router.put("/profile", authMiddleware, updateProfile);
 
 // @route   POST /api/auth/forgot-password
 // @desc    Send password reset email

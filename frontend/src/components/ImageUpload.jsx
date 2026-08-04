@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getPrediction } from '../api/apiService';
 
 // --- Acne Info Data (Enhanced for Demo & Production) ---
 const acneInfo = {
@@ -36,7 +37,6 @@ const acneInfo = {
 
 
 // --- Constants ---
-const PREDICT_ENDPOINT = '/api/predict';
 const MAX_FILE_SIZE_MB = 5;
 
 // --- Component ---
@@ -140,24 +140,8 @@ export default function ImageUpload() {
     setError(null);
     setResult(null);
 
-    const formData = new FormData();
-    formData.append('image', image);
-
     try {
-      const res = await fetch(PREDICT_ENDPOINT, {
-        method: 'POST',
-        credentials: 'include', // Send session cookies for auth
-        body: formData,
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({ 
-          message: `Request failed with status: ${res.status}` 
-        }));
-        throw new Error(errorData.error || errorData.message);
-      }
-
-      const data = await res.json();
+      const data = await getPrediction(image);
 
       if (data && typeof data.class !== 'undefined') {
         setResult(data);

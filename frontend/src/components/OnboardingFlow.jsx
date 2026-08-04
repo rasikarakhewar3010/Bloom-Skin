@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { BackgroundLines } from './ui/background-lines';
+import { updateProfile } from '../api/apiService';
 
 const OnboardingFlow = ({ onComplete }) => {
   const { user, setUser } = useAuth();
@@ -36,9 +35,9 @@ const OnboardingFlow = ({ onComplete }) => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const res = await axios.put('/api/auth/profile', { skinProfile: formData }, { withCredentials: true });
-      if (res.data.user) {
-        setUser(res.data.user);
+      const res = await updateProfile({ skinProfile: formData });
+      if (res.user) {
+        setUser(res.user);
       }
       onComplete(); // Close modal
     } catch (err) {

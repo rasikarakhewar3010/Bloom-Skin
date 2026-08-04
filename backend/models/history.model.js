@@ -42,6 +42,10 @@ const historySchema = new mongoose.Schema({
     trim: true,
     maxlength: 500,
   },
+  deletedAt: {
+    type: Date,
+    default: null,
+  },
 }, { timestamps: true }); // Automatically adds createdAt and updatedAt
 
 // Compound index for efficient per-user history queries sorted by date

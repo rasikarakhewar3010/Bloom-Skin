@@ -26,10 +26,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Download the model file from Hugging Face (FREE hosting)
-# ⚠️ REPLACE this URL with your actual Hugging Face model URL
 RUN mkdir -p model && \
     curl -L -o model/skin_problem_classifier_v1.h5 \
-    "https://huggingface.co/YOUR_USERNAME/bloomskin-model/resolve/main/skin_problem_classifier_v1.h5"
+    "https://huggingface.co/rasikarakhewar3010/bloomskin-model/resolve/main/skin_problem_classifier_v1.h5"
 
 # Set environment variables
 ENV PORT=5000

@@ -14,7 +14,7 @@ const { computeBloomScore } = require('../utils/bloomScore');
 // @route   GET /api/dashboard/stats
 exports.getDashboardStats = async (req, res) => {
   try {
-    const history = await History.find({ user: req.user.id })
+    const history = await History.find({ user: req.user.id, deletedAt: null })
       .sort({ createdAt: 1 }); // oldest first for timeline
 
     if (history.length === 0) {

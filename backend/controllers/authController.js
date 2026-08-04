@@ -112,11 +112,11 @@ exports.updateProfile = async (req, res) => {
     }
 
     if (skinProfile) {
-      user.skinProfile = { ...user.skinProfile.toObject(), ...skinProfile };
+      user.skinProfile = { ...(user.skinProfile?.toObject?.() || user.skinProfile || {}), ...skinProfile };
     }
     
     if (preferences) {
-      user.preferences = { ...user.preferences.toObject(), ...preferences };
+      user.preferences = { ...(user.preferences?.toObject?.() || user.preferences || {}), ...preferences };
     }
 
     await user.save();

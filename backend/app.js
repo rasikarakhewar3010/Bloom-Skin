@@ -8,9 +8,17 @@ const passport = require("passport");
 const MongoStore = require("connect-mongo");
 const path = require("path");
 const helmet = require("helmet");
+const mongoSanitize = require("express-mongo-sanitize");
 const { apiLimiter } = require("./middleware/rateLimiter");
 
 dotenv.config();
+
+// Fail-fast if critical security env vars are missing
+if (!process.env.SESSION_SECRET) {
+  console.error("FATAL: SESSION_SECRET environment variable is not set. Exiting.");
+  process.exit(1);
+}
+
 require("./config/passport");
 
 const app = express();
@@ -34,6 +42,9 @@ app.set("trust proxy", 1);
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: false, limit: '1mb' }));
 app.use(cookieParser());
+
+// NoSQL Injection Prevention — sanitizes user input to prevent MongoDB operator injection
+app.use(mongoSanitize());
 
 // Static files for local image fallback
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -61,7 +72,7 @@ app.use(cors({
 // ------------------------------
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "keyboard cat",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
@@ -102,46 +113,6 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'healthy', timestamp: Date.now() });
 });
 
-// Temporary diagnostic endpoint — check email service configuration
-// REMOVE THIS AFTER DEBUGGING
-app.get('/health/email-check', async (req, res) => {
-  const result = {
-    googleClientIdSet: !!process.env.GOOGLE_CLIENT_ID,
-    googleClientSecretSet: !!process.env.GOOGLE_CLIENT_SECRET,
-    googleRefreshTokenSet: !!process.env.GOOGLE_REFRESH_TOKEN,
-    emailUserSet: !!process.env.EMAIL_USER,
-    frontendUrl: process.env.FRONTEND_URL || "NOT SET",
-    nodeEnv: process.env.NODE_ENV || "NOT SET",
-  };
-
-  // Test Gmail API connectivity
-  if (process.env.GOOGLE_REFRESH_TOKEN && process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
-    try {
-      const { google } = require("googleapis");
-      const oAuth2Client = new google.auth.OAuth2(
-        process.env.GOOGLE_CLIENT_ID,
-        process.env.GOOGLE_CLIENT_SECRET,
-        "https://developers.google.com/oauthplayground"
-      );
-      oAuth2Client.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN });
-      
-      // Force token refresh test
-      const { token } = await oAuth2Client.getAccessToken();
-      if (token) {
-        result.gmailApiStatus = "CONNECTED (Token successfully generated)";
-      } else {
-        result.gmailApiStatus = "FAILED (No token generated)";
-      }
-    } catch (err) {
-      result.gmailApiStatus = "FAILED";
-      result.gmailApiError = err.message;
-    }
-  } else {
-    result.gmailApiStatus = "SKIPPED — Missing Google OAuth credentials";
-  }
-
-  res.json(result);
-});
 
 // ------------------------------
 // ✅ Global Error Handler

@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 # Configuration
 MODEL_PATH = os.environ.get('MODEL_PATH', './model/skin_problem_classifier_v1.h5')
-CONFIDENCE_THRESHOLD = float(os.environ.get('CONFIDENCE_THRESHOLD', 0.50))
+CONFIDENCE_THRESHOLD = float(os.getenv('CONFIDENCE_THRESHOLD', '0.80'))
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
 ALLOWED_MIME_TYPES = {'image/jpeg', 'image/png', 'image/jpg', 'image/webp'}
 

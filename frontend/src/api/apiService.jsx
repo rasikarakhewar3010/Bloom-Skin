@@ -81,3 +81,12 @@ export const trackRoutine = async (timeOfDay) => {
   const response = await api.post('/routine/track', { timeOfDay });
   return response.data;
 };
+
+/**
+ * Updates the user's profile (skin profile, preferences).
+ * @param {Object} profileData - The profile data to update (e.g., { skinProfile: {...} }).
+ */
+export const updateProfile = async (profileData) => {
+  const response = await api.put('/auth/profile', profileData);
+  return response.data;
+};

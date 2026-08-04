@@ -42,7 +42,7 @@ const computeTrend = (confidences) => {
 // @route   GET /api/recommendations
 exports.getRecommendations = async (req, res) => {
   try {
-    const history = await History.find({ user: req.user.id })
+    const history = await History.find({ user: req.user.id, deletedAt: null })
       .sort({ createdAt: -1 })
       .limit(50);
 

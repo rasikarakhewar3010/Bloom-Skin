@@ -18,7 +18,7 @@ const authMiddleware = (req, res, next) => {
   // If req.isAuthenticated() is false, it means the user is not logged in.
   // We send a 401 Unauthorized status and an error message.
   // This prevents any further processing of the request for this route.
-  res.status(401).json({ message: 'Unauthorized: You must be logged in to access this resource.' });
+  res.status(401).json({ error: 'Unauthorized: You must be logged in to access this resource.' });
 };
 
 module.exports = authMiddleware;
