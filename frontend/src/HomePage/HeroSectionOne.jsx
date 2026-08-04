@@ -74,11 +74,11 @@ export function HeroSectionOne() {
         {/* BUTTON:
             - Margin-top now scales more smoothly across breakpoints.
         */}
-        <div className='z-10 mt-8 sm:mt-10 lg:mt-12'>
+        <div className='z-10 mt-10 sm:mt-12 lg:mt-14'>
           <button className="p-[3px] relative group cursor-pointer" onClick={handleGetStartedClick}>
-            <div className="absolute inset-0 bg-gradient-to-r from-[#FFC2D1] to-[#FB6F92] rounded-lg" />
-            <div className="px-6 py-2 sm:px-8 sm:py-2 bg-neutral-900 rounded-[6px] relative group-hover:bg-transparent 
-                           transition duration-200 text-white group-hover:text-black font-medium text-sm sm:text-base cursor-pointer">
+            <div className="absolute inset-0 bg-gradient-to-r from-pink-400 to-pink-600 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-300" />
+            <div className="px-8 py-3 sm:px-10 sm:py-3.5 bg-neutral-900 rounded-full relative group-hover:bg-transparent 
+                           transition duration-300 text-white group-hover:text-white font-bold text-base sm:text-lg cursor-pointer tracking-wide shadow-2xl">
               Start Your Scan
             </div>
           </button>

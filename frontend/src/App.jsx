@@ -16,6 +16,8 @@ import RoutinePage from './RoutinePage/RoutinePage';
 import NotFoundPage from './components/NotFoundPage';
 import ForgotPassword from './LoginPage/ForgotPassword';
 import ResetPassword from './LoginPage/ResetPassword';
+import PrivacyPolicy from './Legal/PrivacyPolicy';
+import TermsOfService from './Legal/TermsOfService';
 
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -34,6 +36,8 @@ function AppWrapper() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsOfService />} />
 
         {/* Protected Routes — Require Authentication */}
         <Route path="/aichat" element={<ProtectedRoute><AIChatPage /></ProtectedRoute>} />

@@ -8,9 +8,9 @@ const content = [
     description:
       "We help detect and manage acne breakouts with targeted solutions that reduce inflammation, unclog pores, and restore skin balance.",
     content: (
-      <div className="flex h-full w-full items-center justify-center text-white">
+      <div className="flex h-full w-full items-center justify-center text-white bg-pink-50">
         <img
-          src="https://mamaearth.in/blog/wp-content/uploads/2023/03/unnamed-11.webp"
+          src="https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?q=80&w=1000&auto=format&fit=crop"
           className="h-full w-full object-cover"
           loading="lazy"
           alt="Acne treatment illustration"
@@ -23,9 +23,9 @@ const content = [
     description:
       "Our app identifies areas of discoloration and suggests effective treatments to even out skin tone and lighten dark patches caused by sun damage or post-acne marks.",
     content: (
-      <div className="flex h-full w-full items-center justify-center text-white">
+      <div className="flex h-full w-full items-center justify-center text-white bg-pink-50">
         <img
-          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNqllZva2-zhe6v8_IpVXVLDIXFKqs_OqThns7bQI2j4T4REwB-aVURSeYSaQlYn8z65s&usqp=CAU"
+          src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=1000&auto=format&fit=crop"
           className="h-full w-full object-cover"
           loading="lazy"
           alt="Hyperpigmentation treatment illustration"
@@ -38,9 +38,9 @@ const content = [
     description:
       "Bloom Skin detects blackhead-prone areas and suggests exfoliation methods and pore-care routines to keep your skin clean and smooth.",
     content: (
-      <div className="flex h-full w-full items-center justify-center text-white">
+      <div className="flex h-full w-full items-center justify-center text-white bg-pink-50">
         <img
-          src="/images/blackh.avif"
+          src="https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=1000&auto=format&fit=crop"
           className="h-full w-full object-cover"
           loading="lazy"
           alt="Blackhead treatment illustration"
@@ -53,18 +53,16 @@ const content = [
     description:
       "Bloom Skin recognizes signs of dryness and flakiness, offering hydration-focused care routines that restore moisture and protect your skin barrier.",
     content: (
-      <div className="flex h-full w-full items-center justify-center text-white">
+      <div className="flex h-full w-full items-center justify-center text-white bg-pink-50">
         <img
-          src="https://img.bebeautiful.in/www-bebeautiful-in/Treat-dehydrated%20-skin-to-reveal-the-flawless-you_mobilehome.jpg"
+          src="https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?q=80&w=1000&auto=format&fit=crop"
           className="h-full w-full object-cover"
           loading="lazy"
           alt="Dry skin treatment illustration"
         />
       </div>
     ),
-  },
-  {
-  },
+  }
 ];
 
 export function StickyScrollRevealDemo() {

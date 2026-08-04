@@ -60,10 +60,10 @@ const BloomSkinFooter = () => {
                 <Link to="/contact" className="text-gray-500 hover:text-pink-600 font-medium transition-colors">Contact Us</Link>
               </li>
               <li>
-                <Link to="/" className="text-gray-500 hover:text-pink-600 font-medium transition-colors">Privacy Policy</Link>
+                <Link to="/privacy" className="text-gray-500 hover:text-pink-600 font-medium transition-colors">Privacy Policy</Link>
               </li>
               <li>
-                <Link to="/" className="text-gray-500 hover:text-pink-600 font-medium transition-colors">Terms of Service</Link>
+                <Link to="/terms" className="text-gray-500 hover:text-pink-600 font-medium transition-colors">Terms of Service</Link>
               </li>
             </ul>
           </div>
