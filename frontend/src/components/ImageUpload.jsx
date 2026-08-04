@@ -225,7 +225,7 @@ export default function ImageUpload() {
 
     } catch (err) {
       // Friendly error messages based on error type
-      if (err.response?.status === 503 || err.message?.includes('503')) {
+      if (err.response?.status === 503 || err.response?.status === 502 || err.message?.includes('503') || err.message?.includes('502')) {
         setError('Our AI is waking up! This takes about 30-60 seconds on the first scan. Please try again in a moment. ☕');
       } else if (err.response?.status === 413) {
         setError('Image is too large. Please use an image under 5MB.');

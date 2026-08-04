@@ -4,9 +4,9 @@ FROM python:3.10-slim
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies (curl is needed to download the model)
+# Install system dependencies (wget is needed to download the model)
 RUN apt-get update && apt-get install -y \
-    curl \
+    wget \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements and install them
@@ -23,9 +23,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of your app
 COPY . .
 
-# Download the model file from Hugging Face (FREE hosting)
+# Cache bust to force re-download: 2
 RUN mkdir -p model && \
-    curl -L -o model/skin_problem_classifier_v1.h5 \
+    wget -qO model/skin_problem_classifier_v1.h5 \
     "https://huggingface.co/Rasik3010/bloomskin-model/resolve/main/skin_problem_classifier_v1.h5?download=true"
 
 # Set environment variables
