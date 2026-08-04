@@ -273,6 +273,11 @@ export default function ImageUpload() {
     canvas.width = video.videoWidth; canvas.height = video.videoHeight;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+    
+    // Flip the canvas context horizontally so the saved photo matches the mirrored video preview
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1, 1);
+    
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     canvas.toBlob((blob) => {
       if (!blob) { setError('Failed to capture photo.'); return; }
@@ -474,7 +479,7 @@ export default function ImageUpload() {
                               autoPlay
                               playsInline
                               muted
-                              className="w-full h-full object-cover"
+                              className="w-full h-full object-cover -scale-x-100"
                               onCanPlay={() => { setCameraActive(true); startFaceDetection(); }}
                             />
                             {!cameraActive && (
