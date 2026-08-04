@@ -76,7 +76,7 @@ exports.handlePrediction = async (req, res) => {
 
     const predictionResponse = await axios.post(PYTHON_API_URL, formData, {
       headers: { ...formData.getHeaders() },
-      timeout: 30000, // 30 second timeout for ML service
+      timeout: 100000, // 100 second timeout to accommodate Render cold starts
     });
 
     const { class: prediction, confidence, info } = predictionResponse.data;
