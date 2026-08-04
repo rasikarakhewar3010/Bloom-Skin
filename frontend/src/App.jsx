@@ -16,6 +16,7 @@ import RoutinePage from './RoutinePage/RoutinePage';
 import NotFoundPage from './components/NotFoundPage';
 import ForgotPassword from './LoginPage/ForgotPassword';
 import ResetPassword from './LoginPage/ResetPassword';
+import ScrollToTop from './components/ScrollToTop';
 import PrivacyPolicy from './Legal/PrivacyPolicy';
 import TermsOfService from './Legal/TermsOfService';
 
@@ -55,6 +56,7 @@ function AppWrapper() {
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <AppWrapper />
     </Router>
   );
