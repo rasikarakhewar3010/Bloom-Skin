@@ -145,7 +145,7 @@ const buildRoutine = (conditions, history) => {
 // @route   GET /api/routine
 exports.getRoutine = async (req, res) => {
   try {
-    const history = await History.find({ user: req.user.id })
+    const history = await History.find({ user: req.user.id, deletedAt: null })
       .sort({ createdAt: -1 })
       .limit(20);
 
@@ -249,7 +249,7 @@ exports.trackRoutine = async (req, res) => {
     const updateField = timeOfDay === 'am' ? 'lastAmCompletion' : 'lastPmCompletion';
     
     user.routineTracking = {
-      ...user.routineTracking,
+      ...(user.routineTracking?.toObject?.() || user.routineTracking || {}),
       [updateField]: now,
       streak
     };

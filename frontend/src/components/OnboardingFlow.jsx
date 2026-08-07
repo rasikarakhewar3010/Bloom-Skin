@@ -127,7 +127,7 @@ const OnboardingFlow = ({ onComplete }) => {
           )}
 
           <div className="flex justify-between items-center mt-10 pt-4 border-t border-gray-100">
-            <div className="flex items-center gap-2">
+            <div>
               {step > 1 ? (
                 <button
                   onClick={handleBack}
@@ -143,11 +143,12 @@ const OnboardingFlow = ({ onComplete }) => {
                   Skip for now
                 </button>
               )}
-            
+            </div>
+
             {step < 3 ? (
               <button
                 onClick={handleNext}
-                disabled={step === 1 && !formData.skinType || step === 2 && !formData.environment}
+                disabled={(step === 1 && !formData.skinType) || (step === 2 && !formData.environment)}
                 className="px-8 py-2 rounded-full font-bold bg-pink-500 text-white hover:bg-pink-600 transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 Next
@@ -161,7 +162,6 @@ const OnboardingFlow = ({ onComplete }) => {
                 {loading ? 'Saving...' : 'Finish Setup'}
               </button>
             )}
-            </div>
           </div>
         </div>
       </div>

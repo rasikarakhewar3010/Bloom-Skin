@@ -1,4 +1,4 @@
-"use client";
+
 import {
   Navbar,
   NavBody,
@@ -142,14 +142,14 @@ export function NavbarDemo() {
             onClose={() => setIsMobileMenuOpen(false)}
           >
             {navItems.map((item, idx) => (
-              <a
+              <Link
                 key={`mobile-link-${idx}`}
-                href={item.link}
+                to={item.link}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="relative text-lg font-medium text-gray-700 hover:text-pink-500 py-2 block"
               >
                 {item.name}
-              </a>
+              </Link>
             ))}
 
             {isLoggedIn && (

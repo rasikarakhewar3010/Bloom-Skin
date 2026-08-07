@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "clean-start": "rm -rf node_modules/.vite && npm install && npm run dev"
+    "clean-start": "npx rimraf node_modules/.vite && npm install && npm run dev"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",

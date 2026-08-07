@@ -3,8 +3,8 @@ const FormData = require('form-data');
 const History = require('../models/history.model');
 
 // Use environment variable for ML service URL with fallback
-const PYTHON_API_URL = process.env.ML_API_URL
-  ? `${process.env.ML_API_URL}/predict`
+const PYTHON_API_URL = process.env.ML_SERVICE_URL
+  ? `${process.env.ML_SERVICE_URL}/predict`
   : 'http://127.0.0.1:5000/predict';
 
 /**

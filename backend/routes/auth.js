@@ -46,7 +46,7 @@ router.get(
     const frontendUrl = process.env.NODE_ENV === 'production' 
       ? 'https://bloomskin.vercel.app' 
       : (process.env.FRONTEND_URL || "http://localhost:5173");
-    res.redirect(frontendUrl);
+    res.redirect(`${frontendUrl}/auth/callback`);
   }
 );
 

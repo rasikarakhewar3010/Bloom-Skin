@@ -7,7 +7,6 @@
  */
 
 const History = require('../models/history.model');
-const { KNOWLEDGE_BASE } = require('../data/recommendationKnowledgeBase');
 const { computeBloomScore } = require('../utils/bloomScore');
 
 // @desc    Get dashboard stats for authenticated user

@@ -8,6 +8,7 @@
  */
 
 const History = require('../models/history.model');
+const User = require('../models/User');
 const { KNOWLEDGE_BASE } = require('../data/recommendationKnowledgeBase');
 const { computeBloomScore } = require('../utils/bloomScore');
 
@@ -187,7 +188,7 @@ exports.getRecommendations = async (req, res) => {
     };
 
     // --- Dynamic Skin Overview (Moved from Frontend for true real-time) ---
-    const userProfile = await require('../models/User').findById(req.user.id);
+    const userProfile = await User.findById(req.user.id);
     const skinType = userProfile?.skinProfile?.skinType || 'normal';
     
     const skinOverview = [
